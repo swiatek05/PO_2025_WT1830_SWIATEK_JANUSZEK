@@ -21,7 +21,7 @@ public class Animal {
         return energy;
     }
 
-    public Genome getGnome() {
+    public Genome getGenome() {
         return genome;
     }
 }

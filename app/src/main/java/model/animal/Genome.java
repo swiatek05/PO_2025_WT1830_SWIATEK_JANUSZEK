@@ -1,37 +1,54 @@
 package model.animal;
 
+import simulation.configs.GenomeConfig;
+
 import java.util.*;
 import java.util.stream.IntStream;
 
 public class Genome {
     protected List<Integer> genes = new ArrayList<>();
+    private static GenomeConfig genomeConfig;
     protected int currentGeneIndex;
 
-    public Genome(int genomeLength) {
+    static void setConfig(GenomeConfig config) {
+        genomeConfig = config;
+    }
+
+    public Genome() {
         Random rn = new Random();
+        int genomeLength = genomeConfig.genomeLength();
+
         for(int i = 0; i < genomeLength; i++) {
             genes.add(rn.nextInt(8));
         }
         currentGeneIndex = rn.nextInt(genomeLength);
     }
 
-    public Genome(Animal parent1, Animal parent2, int genomeLength) {
+    public Genome(Animal parent1, Animal parent2) {
         Random rn = new Random();
-        if (parent1.getEnergy() > parent2.getEnergy()) {
-            Animal stronger = parent1;
-            Animal weaker = parent2;
-        } else {
-            Animal stronger = parent2;
-            Animal weaker = parent1;
-        }
+        int genomeLength = genomeConfig.genomeLength();
+        List<Integer> genes = new ArrayList<>();
 
-        int divisionPoint = genomeLength;
+        Animal stronger = parent1.getEnergy() > parent2.getEnergy() ? parent1 : parent2;
+        Animal weaker = parent1.getEnergy() > parent2.getEnergy() ? parent2 : parent1;
 
+        int divisionPoint = Math.round((float) (genomeLength * weaker.getEnergy()) / (stronger.getEnergy() + weaker.getEnergy()));
+
+        // right stronger
         if (rn.nextBoolean()) {
-
+            genes = IntStream.range(0,genomeLength)
+                    .map(i -> i < divisionPoint ? weaker.getGenome().getGenes().get(i) : stronger.getGenome().getGenes().get(i))
+                    .boxed()
+                    .toList();
+        // left stronger
         } else {
-
+            genes = IntStream.range(0,genomeLength)
+                    .map(i -> i < (genomeLength - divisionPoint) ? stronger.getGenome().getGenes().get(i) : weaker.getGenome().getGenes().get(i))
+                    .boxed()
+                    .toList();
         }
+
+        this.genes = mutate(genes,genomeConfig.minMutateCount(),genomeConfig.minMutateCount());
     }
 
     public List<Integer> mutate(List<Integer> genes, int minMutateCount, int maxMutateCount) {
