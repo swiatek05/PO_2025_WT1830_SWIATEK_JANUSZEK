@@ -13,6 +13,8 @@ public enum MapDirection {
     WEST,
     NORTHWEST;
 
+    private static final MapDirection[] MOVE_VALUES = MapDirection.values();
+
 //    public MapDirection next(){
 //        return switch (this){
 //            case NORTH -> EAST;
@@ -57,11 +59,13 @@ public enum MapDirection {
         };
     }
 
+    public MapDirection rotate(int currentGene){
+        return MOVE_VALUES[(ordinal() + currentGene) % MOVE_VALUES.length];
+    }
+
     public static MapDirection getRandomDirection(){
         Random rn = new Random();
 
-        List<MapDirection> toChoose = List.of(MapDirection.values());
-
-        return toChoose.get(rn.nextInt(toChoose.size()));
+        return MOVE_VALUES[rn.nextInt(MOVE_VALUES.length)];
     }
 }

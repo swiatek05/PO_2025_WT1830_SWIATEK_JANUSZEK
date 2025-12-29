@@ -3,6 +3,7 @@ package model.animal;
 import model.MapDirection;
 import model.Vector2d;
 import model.WorldElement;
+import model.util.MoveValidator;
 import simulation.configs.AnimalConfig;
 
 public class Animal implements WorldElement {
@@ -42,6 +43,23 @@ public class Animal implements WorldElement {
         return new Animal(this.position,childGenome);
     }
 
+    public void move(MoveValidator validator) {
+        Vector2d newPosition = this.position.add(this.orientation.toUnitVector());
+        if (validator.canMoveTo(newPosition)) {
+            this.position = newPosition;
+        } else {
+            // made it to the edge, waiting for map implementation
+        }
+    }
+
+    public void rotate() {
+        this.orientation = this.orientation.rotate(this.genome.getActiveGene());
+    }
+
+    public void eat() {
+        this.energy += animalConfig.plantConsumptionEnergy();
+    }
+
     public void decreaseEnergyMating() {
         this.energy -= animalConfig.energyUsedToMate();
     }
@@ -73,5 +91,9 @@ public class Animal implements WorldElement {
 
     public boolean isDead() {
         return dayOfDeath != -1;
+    }
+
+    public void killOff(int currentDay) {
+        this.dayOfDeath = currentDay;
     }
 }

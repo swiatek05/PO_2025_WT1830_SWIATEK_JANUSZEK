@@ -87,4 +87,8 @@ public class Genome {
         this.currentGeneIndex = (currentGeneIndex + 1) % 8;
     }
 
+    public int getActiveGene() {
+        return genes.get(currentGeneIndex);
+    }
+
 }
