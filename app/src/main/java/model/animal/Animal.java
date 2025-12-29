@@ -64,6 +64,10 @@ public class Animal implements WorldElement {
         this.energy -= animalConfig.energyUsedToMate();
     }
 
+    public void decreaseEnergyEndOfDay() {
+        this.energy -= animalConfig.dayEndEnergyLoss();
+    }
+
     public boolean canMate() {
         return this.energy >= animalConfig.ableToMateEnergyNeeded();
     }
@@ -95,5 +99,9 @@ public class Animal implements WorldElement {
 
     public void killOff(int currentDay) {
         this.dayOfDeath = currentDay;
+    }
+
+    public boolean isAt(Vector2d position) {
+        return this.position.equals(position);
     }
 }
