@@ -14,6 +14,7 @@ public class Genome {
         genomeConfig = config;
     }
 
+    // initial animal genome generation, genes are chosen at random
     public Genome() {
         Random rn = new Random();
         int genomeLength = genomeConfig.genomeLength();
@@ -24,6 +25,7 @@ public class Genome {
         currentGeneIndex = rn.nextInt(genomeLength);
     }
 
+    // genome created when two animals mate, genes are a split between parents
     public Genome(Animal parent1, Animal parent2) {
         Random rn = new Random();
         int genomeLength = genomeConfig.genomeLength();
@@ -48,10 +50,14 @@ public class Genome {
                     .toList();
         }
 
-        this.genes = mutate(genes,genomeConfig.minMutateCount(),genomeConfig.minMutateCount());
+        this.genes = mutate(genes);
+        this.currentGeneIndex = rn.nextInt(0,genomeLength);
     }
 
-    public List<Integer> mutate(List<Integer> genes, int minMutateCount, int maxMutateCount) {
+    // used to mutate a list of genes
+    public List<Integer> mutate(List<Integer> genes) {
+        int minMutateCount = genomeConfig.minMutateCount();
+        int maxMutateCount = genomeConfig.minMutateCount();
         Random rn = new Random();
 
         int toMutateCount = rn.nextInt(minMutateCount,maxMutateCount+1);
@@ -75,6 +81,10 @@ public class Genome {
 
     public int getCurrentGeneIndex() {
         return currentGeneIndex;
+    }
+
+    public void moveCurrentGeneIndex() {
+        this.currentGeneIndex = (currentGeneIndex + 1) % 8;
     }
 
 }

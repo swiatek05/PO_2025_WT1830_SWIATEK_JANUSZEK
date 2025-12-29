@@ -1,5 +1,8 @@
 package model;
 
+import java.util.List;
+import java.util.Random;
+
 public enum MapDirection {
     NORTH,
     NORTHEAST,
@@ -52,5 +55,13 @@ public enum MapDirection {
             case EAST -> WEST;
             case NORTHWEST -> SOUTHEAST;
         };
+    }
+
+    public static MapDirection getRandomDirection(){
+        Random rn = new Random();
+
+        List<MapDirection> toChoose = List.of(MapDirection.values());
+
+        return toChoose.get(rn.nextInt(toChoose.size()));
     }
 }
