@@ -3,6 +3,7 @@ package model.animal;
 import model.MapDirection;
 import model.Vector2d;
 import model.WorldElement;
+import model.map.GlobeWorldMap;
 import model.util.MoveValidator;
 import simulation.configs.AnimalConfig;
 
@@ -13,51 +14,76 @@ public class Animal implements WorldElement {
     private final Genome genome;
     private static AnimalConfig animalConfig;
     private int dayOfDeath = -1;
+    private int birthDay;
+    private int childCount=0;
 
     public static void setAnimalConfig(AnimalConfig config) {
         animalConfig = config;
     }
 
     // initial animals created at the start of simulation
-    public Animal(Vector2d position) {
+    public Animal(Vector2d position,int currentDay) {
         this.position = position;
         this.energy = animalConfig.startEnergy();
         this.genome = new Genome();
         this.orientation = MapDirection.getRandomDirection();
+        this.birthDay = currentDay;
     }
 
     // create animal by mating
-    public Animal(Vector2d position, Genome genome){
+    public Animal(Vector2d position, Genome genome,int currentDay) {
         this.position = position;
         this.energy = animalConfig.energyUsedToMate() * 2;
         this.genome = genome;
         this.orientation = MapDirection.getRandomDirection();
+        this.birthDay = currentDay;
+    }
+    public int getAge(int currentDay) {
+        if (isDead()){
+            return dayOfDeath-birthDay;
+        }
+        return currentDay-birthDay;
     }
 
     // mating behaviour
-    public Animal mate(Animal partner) {
+    public Animal mate(Animal partner,int currentDay) {
         Genome childGenome = new Genome(this, partner);
         this.decreaseEnergyMating();
         partner.decreaseEnergyMating();
+        this.childCount++;
+        partner.childCount++;
 
-        return new Animal(this.position,childGenome);
+        return new Animal(this.position,childGenome,currentDay);
     }
 
-    public void move(MoveValidator validator) {
-        Vector2d newPosition = this.position.add(this.orientation.toUnitVector());
-        if (validator.canMoveTo(newPosition)) {
-            this.position = newPosition;
-        } else {
-            // made it to the edge, waiting for map implementation
+    public void move(GlobeWorldMap map) {
+        Vector2d unitVector= this.orientation.toUnitVector();
+        Vector2d wantedPosition = this.position.add(unitVector);
+        this.position=calculateNewPosition(unitVector,this.position,wantedPosition,map);
+        this.decreaseEnergyEndOfDay();
+
+    }
+
+    private Vector2d calculateNewPosition(Vector2d unitVector,Vector2d oldPosition,Vector2d wantedPosition,GlobeWorldMap map) {
+        int height=map.getMapHeight();
+        int width=map.getMapWidth();
+        int wantedX=wantedPosition.getX();
+        int wantedY=wantedPosition.getY();
+        Vector2d finalPosition = wantedPosition;
+        finalPosition= new Vector2d((wantedX+width)%width,wantedY); //to zawsze dziala , wiec nie trzeba rozpatrywac przypadkow
+        if (wantedY<0 || wantedY>=height){
+            this.orientation=this.getOrientation().reverse();
+            finalPosition=new Vector2d(finalPosition.getX(),oldPosition.getY());
         }
+        return finalPosition;
     }
-
     public void rotate() {
         this.orientation = this.orientation.rotate(this.genome.getActiveGene());
     }
 
     public void eat() {
         this.energy += animalConfig.plantConsumptionEnergy();
+        //chyba ze trucizna trzeba ro rozbudowac
     }
 
     public void decreaseEnergyMating() {
@@ -87,6 +113,9 @@ public class Animal implements WorldElement {
 
     public int getEnergy() {
         return energy;
+    }
+    public int getChildrenCount(){
+        return childCount;
     }
 
     public Genome getGenome() {
