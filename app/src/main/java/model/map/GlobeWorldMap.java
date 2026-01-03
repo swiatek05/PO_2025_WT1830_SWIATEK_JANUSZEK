@@ -104,6 +104,7 @@ public class GlobeWorldMap implements WorldMap {
         return animals!=null && !animals.isEmpty();
     }
 
+    // i don't really see a use for this method
     @Override
     public WorldElement objectAt(Vector2d position,int currentDay) {
         List<Animal> animals=animalsAt(position);
@@ -117,7 +118,8 @@ public class GlobeWorldMap implements WorldMap {
 
     }
 
-    private Animal findStrongestAnimal(List<Animal> animals,int currentDay) { //mozna sie zastanowic jak to zmienic bo troche brzydkie a petle sie powtarszaja prawie ze
+    // public for now maybe will need to change it
+    public Animal findStrongestAnimal(List<Animal> animals,int currentDay) { //mozna sie zastanowic jak to zmienic bo troche brzydkie a petle sie powtarszaja prawie ze
         List<Animal> strongestAnimals=new ArrayList<>();
         int maxEnergy=-1;
         for (Animal animal:animals){ //szukam max
@@ -278,5 +280,9 @@ public class GlobeWorldMap implements WorldMap {
             animals.put(position,new ArrayList<>());
         }
         animals.get(position).add(animal);
+    }
+
+    public Map<Vector2d, AbstractPlant> getPlants() {
+        return plants;
     }
 }

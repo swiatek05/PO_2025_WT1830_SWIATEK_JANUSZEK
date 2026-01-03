@@ -11,7 +11,7 @@ import simulation.configs.SimulationConfig;
 import java.util.*;
 
 public class Simulation implements Runnable {
-    private final WorldMap map;
+    private final GlobeWorldMap map;
     private final SimulationConfig simulationConfig;
     private List<Animal> aliveAnimals = new ArrayList<>();
     private List<Animal> deadAnimals = new ArrayList<>();
@@ -40,12 +40,43 @@ public class Simulation implements Runnable {
     @Override
     public void run() {
         while (isRunning) {
+
+            for (Animal animal : aliveAnimals) {
+                if (animal.isDead()) {
+                    animal.killOff(currentDay);
+                    aliveAnimals.remove(animal);
+                    deadAnimals.add(animal);
+                }
+            }
+
             removeDeadAnimals();
             moveAnimals();
             eatPlants();
             mateAnimals();
             growPlants();
-            map.removeDeadAnimals(currentDay); // this needs to be changed because we need to keep track of dead animals
+            currentDay++;
+        }
+    }
+
+    private void removeDeadAnimals() {
+        map.removeDeadAnimals(currentDay);
+    }
+
+    private void moveAnimals() {
+        for (Animal animal : this.aliveAnimals) {
+            map.move(animal);
+        }
+    }
+
+    private void eatPlants() {
+        for (AbstractPlant plant : this.map.getPlants().values()) {
+            List <Animal> potentialAnimals = map.animalsAt(plant.getPosition());
+            if(!potentialAnimals.isEmpty()) {
+                Animal strongest = map.findStrongestAnimal(potentialAnimals,currentDay);
+                strongest.eat(plant);
+                // we now need to remove the plant (easy) and then figure out if it was in the steppe or in the jungle
+                // and accordingly add a free space there
+            }
         }
     }
 }
