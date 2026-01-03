@@ -13,7 +13,9 @@ import java.util.*;
 public class Simulation implements Runnable {
     private final WorldMap map;
     private final SimulationConfig simulationConfig;
-    private final List<Animal> aliveAnimals = new ArrayList<>();
+    private List<Animal> aliveAnimals = new ArrayList<>();
+    private List<Animal> deadAnimals = new ArrayList<>();
+    private boolean isRunning = true;
     private int currentDay = 0;
 
     public Simulation(GlobeWorldMap map, SimulationConfig config) {
@@ -37,6 +39,13 @@ public class Simulation implements Runnable {
 
     @Override
     public void run() {
-
+        while (isRunning) {
+            removeDeadAnimals();
+            moveAnimals();
+            eatPlants();
+            mateAnimals();
+            growPlants();
+            map.removeDeadAnimals(currentDay); // this needs to be changed because we need to keep track of dead animals
+        }
     }
 }

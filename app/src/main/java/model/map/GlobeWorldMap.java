@@ -4,6 +4,7 @@ import model.MapChangeListener;
 import model.Vector2d;
 import model.WorldElement;
 import model.animal.Animal;
+import model.plant.AbstractPlant;
 import model.plant.Grass;
 import model.util.Boundary;
 
@@ -14,7 +15,7 @@ public class GlobeWorldMap implements WorldMap {
     private final int MapHeight;
 
     private final Map<Vector2d, List<Animal>> animals= new HashMap<>();
-    private final Map<Vector2d, Grass> plants=new HashMap<>();
+    private final Map<Vector2d, AbstractPlant> plants=new HashMap<>();
     private final Set<Vector2d> FreePlaceForPlantsJungle=new HashSet<>();
     private final Set<Vector2d> FreePlaceForPlantsSteppe=new HashSet<>();
 
@@ -90,7 +91,7 @@ public class GlobeWorldMap implements WorldMap {
     }
 
     @Override
-    public Grass plantAt(Vector2d position) {
+    public AbstractPlant plantAt(Vector2d position) {
         return this.plants.get(position);  //mozliwy null czyli brak rosliny
     }
 

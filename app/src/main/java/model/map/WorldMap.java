@@ -3,7 +3,7 @@ package model.map;
 import model.MapChangeListener;
 import model.Vector2d;
 import model.animal.Animal;
-import model.plant.Grass;
+import model.plant.AbstractPlant;
 import model.WorldElement;
 import model.util.Boundary;
 import model.util.MoveValidator;
@@ -17,7 +17,7 @@ public interface WorldMap extends MoveValidator {
 
     List<Animal> animalsAt(Vector2d position); //zwraca liste zwierzat na danej pozycji
 
-    Grass plantAt(Vector2d position); //zwraca roslin ejesli istnieje
+    AbstractPlant plantAt(Vector2d position); //zwraca roslin ejesli istnieje
 
     boolean isOccupied(Vector2d position); //zprawdza czy na polu cos jest (roslina albo zwierze)
 
