@@ -15,8 +15,8 @@ public class Animal implements WorldElement {
     private final Genome genome;
     private static AnimalConfig animalConfig;
     private int dayOfDeath = -1;
-    private int birthDay;
-    private int childCount=0;
+    private final int birthDay;
+    private int childCount = 0;
 
     public static void setAnimalConfig(AnimalConfig config) {
         animalConfig = config;
@@ -39,6 +39,7 @@ public class Animal implements WorldElement {
         this.orientation = MapDirection.getRandomDirection();
         this.birthDay = currentDay;
     }
+
     public int getAge(int currentDay) {
         if (isDead()){
             return dayOfDeath-birthDay;
@@ -87,8 +88,9 @@ public class Animal implements WorldElement {
     public void eat(AbstractPlant plant) {
         if (plant.getConsumptionEnergy() < 0) {
             this.energy += (int) (plant.getConsumptionEnergy() * genome.getImmunityPercentage());
+        } else {
+            this.energy += plant.getConsumptionEnergy();
         }
-        this.energy += plant.getConsumptionEnergy();
     }
 
     public void decreaseEnergyMating() {

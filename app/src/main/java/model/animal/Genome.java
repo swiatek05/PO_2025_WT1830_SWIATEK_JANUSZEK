@@ -11,7 +11,7 @@ public class Genome {
     private static GenomeConfig genomeConfig;
     private int currentGeneIndex;
 
-    static void setConfig(GenomeConfig config) {
+    public static void setConfig(GenomeConfig config) {
         genomeConfig = config;
     }
 

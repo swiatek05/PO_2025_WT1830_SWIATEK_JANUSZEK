@@ -1,4 +1,6 @@
 package simulation.configs;
 
-public record SimulationConfig() {
+import simulation.SimulationVariant;
+
+public record SimulationConfig(AnimalConfig animalConfig, GenomeConfig genomeConfig, PlantConfig plantConfig, SimulationVariant simulationVariant, int startingPlantAmount, int startingAnimalAmount, int plantCountToGrowEveryday) {
 }
