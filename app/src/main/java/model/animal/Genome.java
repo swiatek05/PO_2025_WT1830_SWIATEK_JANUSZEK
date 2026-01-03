@@ -6,9 +6,10 @@ import java.util.*;
 import java.util.stream.IntStream;
 
 public class Genome {
-    protected List<Integer> genes = new ArrayList<>();
+    private List<Integer> genes = new ArrayList<>();
+    private final float immunityPercentage;
     private static GenomeConfig genomeConfig;
-    protected int currentGeneIndex;
+    private int currentGeneIndex;
 
     static void setConfig(GenomeConfig config) {
         genomeConfig = config;
@@ -20,9 +21,10 @@ public class Genome {
         int genomeLength = genomeConfig.genomeLength();
 
         for(int i = 0; i < genomeLength; i++) {
-            genes.add(rn.nextInt(8));
+            this.genes.add(rn.nextInt(8));
         }
-        currentGeneIndex = rn.nextInt(genomeLength);
+        this.currentGeneIndex = rn.nextInt(genomeLength);
+        this.immunityPercentage = calculateImmunity(this.genes);
     }
 
     // genome created when two animals mate, genes are a split between parents
@@ -52,6 +54,7 @@ public class Genome {
 
         this.genes = mutate(genes);
         this.currentGeneIndex = rn.nextInt(0,genomeLength);
+        this.immunityPercentage = calculateImmunity(genes);
     }
 
     // used to mutate a list of genes
@@ -75,6 +78,19 @@ public class Genome {
         return genes;
     }
 
+    public float calculateImmunity(List<Integer> genes) {
+        List<Integer> immunityGenes = genomeConfig.immunityGenome().getGenes();
+        int matching = 0;
+
+        for(int i = 0; i < genomeConfig.genomeLength(); i++) {
+            if (Objects.equals(immunityGenes.get(i), genes.get(i))) {
+                matching += 1;
+            }
+        }
+
+        return (float) matching / genomeConfig.genomeLength();
+    }
+
     public List<Integer> getGenes() {
         return genes;
     }
@@ -91,4 +107,7 @@ public class Genome {
         return genes.get(currentGeneIndex);
     }
 
+    public float getImmunityPercentage() {
+        return immunityPercentage;
+    }
 }

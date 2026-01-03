@@ -62,6 +62,9 @@ public class Animal implements WorldElement {
         Vector2d wantedPosition = this.position.add(unitVector);
         this.position=calculateNewPosition(unitVector,this.position,wantedPosition,map);
         this.decreaseEnergyEndOfDay();
+
+        // idk maybe this should be somewhere else
+        this.genome.moveCurrentGeneIndex();
     }
 
     private Vector2d calculateNewPosition(Vector2d unitVector,Vector2d oldPosition,Vector2d wantedPosition,GlobeWorldMap map) {
@@ -82,6 +85,9 @@ public class Animal implements WorldElement {
     }
 
     public void eat(AbstractPlant plant) {
+        if (plant.getConsumptionEnergy() < 0) {
+            this.energy += (int) (plant.getConsumptionEnergy() * genome.getImmunityPercentage());
+        }
         this.energy += plant.getConsumptionEnergy();
     }
 
