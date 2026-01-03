@@ -3,14 +3,12 @@ package model.map;
 import model.MapChangeListener;
 import model.Vector2d;
 import model.animal.Animal;
-import model.plant.Plant;
+import model.plant.Grass;
 import model.WorldElement;
 import model.util.Boundary;
 import model.util.MoveValidator;
 
-import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 
 public interface WorldMap extends MoveValidator {
     void place(Animal animal); //umieszcza zwierze na mapie
@@ -19,7 +17,7 @@ public interface WorldMap extends MoveValidator {
 
     List<Animal> animalsAt(Vector2d position); //zwraca liste zwierzat na danej pozycji
 
-    Plant plantAt(Vector2d position); //zwraca roslin ejesli istnieje
+    Grass plantAt(Vector2d position); //zwraca roslin ejesli istnieje
 
     boolean isOccupied(Vector2d position); //zprawdza czy na polu cos jest (roslina albo zwierze)
 

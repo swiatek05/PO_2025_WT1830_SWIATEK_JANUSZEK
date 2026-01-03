@@ -1,4 +1,4 @@
 package simulation.configs;
 
-public record AnimalConfig(int plantConsumptionEnergy, int startEnergy, int dayEndEnergyLoss, int ableToMateEnergyNeeded, int energyUsedToMate) {
+public record AnimalConfig( int startEnergy, int dayEndEnergyLoss, int ableToMateEnergyNeeded, int energyUsedToMate) {
 }
