@@ -4,7 +4,6 @@ import model.Vector2d;
 import model.animal.Animal;
 import model.animal.Genome;
 import model.map.GlobeWorldMap;
-import model.map.WorldMap;
 import model.plant.AbstractPlant;
 import simulation.configs.SimulationConfig;
 
@@ -78,5 +77,13 @@ public class Simulation implements Runnable {
                 // and accordingly add a free space there
             }
         }
+    }
+
+    private void mateAnimals() {
+
+    }
+
+    private void growPlants() {
+        map.spawnPlants(simulationConfig.plantCountToGrowEveryday());
     }
 }
