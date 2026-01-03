@@ -6,8 +6,8 @@ import simulation.configs.PlantConfig;
 
 public abstract class AbstractPlant implements WorldElement {
     private final Vector2d position;
-    private static PlantConfig plantConfig;
-    private final int consumptionEnergy;
+    protected static PlantConfig plantConfig;
+    protected int consumptionEnergy;
 
     public static void setPlantConfig(PlantConfig config) {
         plantConfig = config;
@@ -21,5 +21,9 @@ public abstract class AbstractPlant implements WorldElement {
     @Override
     public Vector2d getPosition() {
         return position;
+    }
+
+    public int getConsumptionEnergy() {
+        return consumptionEnergy;
     }
 }

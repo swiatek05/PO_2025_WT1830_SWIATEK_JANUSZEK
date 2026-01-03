@@ -4,6 +4,7 @@ import model.MapDirection;
 import model.Vector2d;
 import model.WorldElement;
 import model.map.GlobeWorldMap;
+import model.plant.AbstractPlant;
 import model.util.MoveValidator;
 import simulation.configs.AnimalConfig;
 
@@ -61,7 +62,6 @@ public class Animal implements WorldElement {
         Vector2d wantedPosition = this.position.add(unitVector);
         this.position=calculateNewPosition(unitVector,this.position,wantedPosition,map);
         this.decreaseEnergyEndOfDay();
-
     }
 
     private Vector2d calculateNewPosition(Vector2d unitVector,Vector2d oldPosition,Vector2d wantedPosition,GlobeWorldMap map) {
@@ -81,9 +81,8 @@ public class Animal implements WorldElement {
         this.orientation = this.orientation.rotate(this.genome.getActiveGene());
     }
 
-    public void eat() {
-        this.energy += animalConfig.plantConsumptionEnergy();
-        //chyba ze trucizna trzeba ro rozbudowac
+    public void eat(AbstractPlant plant) {
+        this.energy += plant.getConsumptionEnergy();
     }
 
     public void decreaseEnergyMating() {
