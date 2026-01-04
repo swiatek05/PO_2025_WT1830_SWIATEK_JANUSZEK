@@ -26,6 +26,7 @@ public class GlobeWorldMap implements WorldMap {
     private final int jungleMinY; //zakladadam ze włącznie
     private final int jungleMaxY;
 
+    // only for testing
     public static void setMapConfig(MapConfig config) {
         mapConfig = config;
     }

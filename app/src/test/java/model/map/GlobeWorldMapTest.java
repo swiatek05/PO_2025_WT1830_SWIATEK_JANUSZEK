@@ -1,8 +1,9 @@
-package model;
+package model.map;
 
+import model.MapDirection;
+import model.Vector2d;
 import model.animal.Animal;
 import model.animal.Genome;
-import model.map.GlobeWorldMap;
 import org.junit.jupiter.api.Test;
 import simulation.configs.AnimalConfig;
 import simulation.configs.GenomeConfig;
@@ -45,7 +46,7 @@ public class GlobeWorldMapTest {
         Genome.setConfig(defaultGenomeConfig);
         GlobeWorldMap map = new GlobeWorldMap();
         Vector2d position1 = new Vector2d(1,1);
-        Animal deadAnimal1 = new Animal(position1, new Genome(List.of(0,1,1,3)),MapDirection.NORTH,-1,0,0,0);
+        Animal deadAnimal1 = new Animal(position1, new Genome(List.of(0,1,1,3)), MapDirection.NORTH,-1,0,0,0);
         Vector2d position2 = new Vector2d(2,2);
         Animal deadAnimal2 = new Animal(position2, new Genome(List.of(0,1,1,3)),MapDirection.NORTH,-1,0,0,0);
         map.place(deadAnimal1);

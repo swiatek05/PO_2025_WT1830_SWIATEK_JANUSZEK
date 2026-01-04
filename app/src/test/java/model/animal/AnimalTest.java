@@ -1,7 +1,7 @@
-package model;
+package model.animal;
 
-import model.animal.Animal;
-import model.animal.Genome;
+import model.MapDirection;
+import model.Vector2d;
 import org.junit.jupiter.api.Test;
 import simulation.configs.AnimalConfig;
 import simulation.configs.GenomeConfig;
@@ -23,7 +23,7 @@ public class AnimalTest {
         Genome.setConfig(defaultGenomeConfig);
         Vector2d position = new Vector2d(1,1);
         Genome genome = new Genome();
-        Animal animal1 = new Animal(position,genome,MapDirection.NORTH,1,1,0,0);
+        Animal animal1 = new Animal(position,genome, MapDirection.NORTH,1,1,0,0);
         Animal animal2 = new Animal(position,genome,MapDirection.NORTH,2,1,0,0);
         Animal animal3 = new Animal(position,genome,MapDirection.NORTH,3,1,0,0);
 

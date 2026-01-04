@@ -13,25 +13,27 @@ import static java.util.Collections.max;
 
 public class Simulation implements Runnable {
     private final GlobeWorldMap map;
-    private final SimulationConfig simulationConfig;
+    private static SimulationConfig simulationConfig;
     private List<Animal> aliveAnimals = new ArrayList<>();
     private List<Animal> deadAnimals = new ArrayList<>();
     private boolean isRunning = true;
     private int currentDay = 0;
 
-    public Simulation(GlobeWorldMap map, SimulationConfig config) {
+    public static void setConfig(SimulationConfig config) {
+        simulationConfig = config;
+        Animal.setAnimalConfig(simulationConfig.animalConfig());
+        AbstractPlant.setPlantConfig(simulationConfig.plantConfig());
+        Genome.setConfig(simulationConfig.genomeConfig());
+        GlobeWorldMap.setMapConfig(simulationConfig.mapConfig());
+    }
+
+    public Simulation(GlobeWorldMap map) {
         this.map = map;
-        this.simulationConfig = config;
 
-        Animal.setAnimalConfig(config.animalConfig());
-        AbstractPlant.setPlantConfig(config.plantConfig());
-        Genome.setConfig(config.genomeConfig());
-        GlobeWorldMap.setMapConfig(config.mapConfig());
-
-        map.spawnPlants(config.startingPlantAmount());
+        map.spawnPlants(simulationConfig.startingPlantAmount());
 
         Random rn = new Random();
-        for (int i = 0; i < config.startingAnimalAmount(); i++) {
+        for (int i = 0; i < simulationConfig.startingAnimalAmount(); i++) {
             Vector2d position = new Vector2d(rn.nextInt(map.getMapWidth()), rn.nextInt(map.getMapHeight()));
             Animal animal = new Animal(position, this.currentDay);
             map.place(animal);
@@ -60,7 +62,7 @@ public class Simulation implements Runnable {
         }
     }
 
-    private void removeDeadAnimals() {
+    public void removeDeadAnimals() {
         map.removeDeadAnimals(currentDay);
     }
 

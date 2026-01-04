@@ -9,6 +9,7 @@ public abstract class AbstractPlant implements WorldElement {
     protected static PlantConfig plantConfig;
     protected int consumptionEnergy;
 
+    // only for testing
     public static void setPlantConfig(PlantConfig config) {
         plantConfig = config;
     }

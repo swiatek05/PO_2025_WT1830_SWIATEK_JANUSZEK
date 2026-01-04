@@ -22,6 +22,7 @@ public class Animal implements WorldElement, Comparable<Animal>{
     private final int birthDay;
     private int childCount = 0;
 
+    // only for testing
     public static void setAnimalConfig(AnimalConfig config) {
         animalConfig = config;
     }
