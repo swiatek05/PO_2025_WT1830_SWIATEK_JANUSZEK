@@ -40,6 +40,15 @@ public class Animal implements WorldElement {
         this.birthDay = currentDay;
     }
 
+    // only used for testing
+    public Animal(Vector2d position, Genome genome, MapDirection orientation, int energy, int currentDay) {
+        this.position = position;
+        this.energy = energy;
+        this.genome = genome;
+        this.orientation = orientation;
+        this.birthDay = currentDay;
+    }
+
     public int getAge(int currentDay) {
         if (isDead()){
             return dayOfDeath-birthDay;
