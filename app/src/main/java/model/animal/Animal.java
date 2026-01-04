@@ -171,4 +171,9 @@ public class Animal implements WorldElement, Comparable<Animal>{
     public int hashCode() {
         return Objects.hash(orientation, position, energy, genome, dayOfDeath, age, birthDay, childCount);
     }
+
+    // i'm not sure about this
+    public static int getEnergyNeededToMate() {
+        return animalConfig.energyUsedToMate();
+    }
 }

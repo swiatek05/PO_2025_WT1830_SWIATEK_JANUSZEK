@@ -10,7 +10,6 @@ import simulation.configs.SimulationConfig;
 import java.util.*;
 
 import static java.util.Collections.max;
-import static java.util.Collections.sort;
 
 public class Simulation implements Runnable {
     private final GlobeWorldMap map;
@@ -92,11 +91,14 @@ public class Simulation implements Runnable {
                 for (int i = 1; i < animalsToMate.size(); i+=2) {
                     Animal parent1 = animalsToMate.get(i);
                     Animal parent2 = animalsToMate.get(i-1);
-                    // need to check if animals have enough energy to mate but that is stored in AnimalConfig
-                    Animal child = parent1.mate(parent2,this.currentDay);
+                    int energyNeededToMate = Animal.getEnergyNeededToMate();
 
-                    map.place(animal);
-                    this.aliveAnimals.add(animal);
+                    if (parent1.getEnergy() >= energyNeededToMate && parent2.getEnergy() >= energyNeededToMate ){
+                        Animal child = parent1.mate(parent2, this.currentDay);
+
+                        map.place(child);
+                        this.aliveAnimals.add(child);
+                    }
                 }
             }
         }
