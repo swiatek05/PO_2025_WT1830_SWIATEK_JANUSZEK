@@ -9,6 +9,7 @@ import org.jspecify.annotations.NonNull;
 import simulation.configs.AnimalConfig;
 
 import java.util.Comparator;
+import java.util.Objects;
 
 public class Animal implements WorldElement, Comparable<Animal>{
     private MapDirection orientation;
@@ -17,6 +18,7 @@ public class Animal implements WorldElement, Comparable<Animal>{
     private final Genome genome;
     private static AnimalConfig animalConfig;
     private int dayOfDeath = -1;
+    private int age = 0;
     private final int birthDay;
     private int childCount = 0;
 
@@ -43,19 +45,18 @@ public class Animal implements WorldElement, Comparable<Animal>{
     }
 
     // only used for testing
-    public Animal(Vector2d position, Genome genome, MapDirection orientation, int energy, int currentDay) {
+    public Animal(Vector2d position, Genome genome, MapDirection orientation, int energy, int currentDay, int childCount, int age) {
         this.position = position;
         this.energy = energy;
         this.genome = genome;
         this.orientation = orientation;
         this.birthDay = currentDay;
+        this.childCount = childCount;
+        this.age = age;
     }
 
-    public int getAge(int currentDay) {
-        if (isDead()){
-            return dayOfDeath-birthDay;
-        }
-        return currentDay-birthDay;
+    public int getAge() {
+        return this.age;
     }
 
     // mating behaviour
@@ -74,6 +75,7 @@ public class Animal implements WorldElement, Comparable<Animal>{
         Vector2d wantedPosition = this.position.add(unitVector);
         this.position=calculateNewPosition(unitVector,this.position,wantedPosition,map);
         this.decreaseEnergyEndOfDay();
+        this.age++;
 
         // idk maybe this should be somewhere else
         this.genome.moveCurrentGeneIndex();
@@ -126,12 +128,13 @@ public class Animal implements WorldElement, Comparable<Animal>{
 
     @Override
     public String toString() {
-        return position.toString();
+        return this.energy + " " + this.age + " " + this.childCount;
     }
 
     public int getEnergy() {
         return energy;
     }
+
     public int getChildrenCount(){
         return childCount;
     }
@@ -155,5 +158,17 @@ public class Animal implements WorldElement, Comparable<Animal>{
     @Override
     public int compareTo(@NonNull Animal o) {
         return Comparator.comparing(Animal::getEnergy).thenComparing(Animal::getAge).thenComparing(Animal::getChildrenCount).compare(this,o);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        Animal animal = (Animal) o;
+        return energy == animal.energy && dayOfDeath == animal.dayOfDeath && age == animal.age && birthDay == animal.birthDay && childCount == animal.childCount && orientation == animal.orientation && Objects.equals(position, animal.position) && Objects.equals(genome, animal.genome);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(orientation, position, energy, genome, dayOfDeath, age, birthDay, childCount);
     }
 }

@@ -76,7 +76,7 @@ public class Simulation implements Runnable {
         for (AbstractPlant plant : this.map.getPlants().values()) {
             List <Animal> potentialAnimals = map.animalsAt(plant.getPosition());
             if(!potentialAnimals.isEmpty()) {
-                Animal strongest = map.findStrongestAnimal(potentialAnimals,currentDay);
+                Animal strongest = max(potentialAnimals);
                 strongest.eat(plant);
                 map.removePlantFromMap(plant);
             }

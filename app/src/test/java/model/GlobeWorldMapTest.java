@@ -45,9 +45,9 @@ public class GlobeWorldMapTest {
         Genome.setConfig(defaultGenomeConfig);
         GlobeWorldMap map = new GlobeWorldMap();
         Vector2d position1 = new Vector2d(1,1);
-        Animal deadAnimal1 = new Animal(position1, new Genome(List.of(0,1,1,3)),MapDirection.NORTH,-1,0);
+        Animal deadAnimal1 = new Animal(position1, new Genome(List.of(0,1,1,3)),MapDirection.NORTH,-1,0,0,0);
         Vector2d position2 = new Vector2d(2,2);
-        Animal deadAnimal2 = new Animal(position2, new Genome(List.of(0,1,1,3)),MapDirection.NORTH,-1,0);
+        Animal deadAnimal2 = new Animal(position2, new Genome(List.of(0,1,1,3)),MapDirection.NORTH,-1,0,0,0);
         map.place(deadAnimal1);
         map.place(deadAnimal2);
 
@@ -70,7 +70,7 @@ public class GlobeWorldMapTest {
         Genome.setConfig(defaultGenomeConfig);
         GlobeWorldMap map = new GlobeWorldMap();
         Vector2d position = new Vector2d(1,1);
-        Animal animal = new Animal(position, new Genome(List.of(0,0,0,0)),MapDirection.NORTH,10,0);
+        Animal animal = new Animal(position, new Genome(List.of(0,0,0,0)),MapDirection.NORTH,10,0,0,0);
         Vector2d expectedPosition = new Vector2d(1,2);
 
         // when
@@ -93,7 +93,7 @@ public class GlobeWorldMapTest {
         Genome.setConfig(defaultGenomeConfig);
         GlobeWorldMap map = new GlobeWorldMap();
         Vector2d position = new Vector2d(1,1);
-        Animal animal = new Animal(position, new Genome(List.of(0,1,1,3)),MapDirection.NORTH,10,0);
+        Animal animal = new Animal(position, new Genome(List.of(0,1,1,3)),MapDirection.NORTH,10,0,0,0);
         Vector2d expectedPosition = new Vector2d(2,2);
 
         // when
@@ -117,7 +117,7 @@ public class GlobeWorldMapTest {
         Genome.setConfig(defaultGenomeConfig);
         GlobeWorldMap map = new GlobeWorldMap();
         Vector2d position = new Vector2d(9,1);
-        Animal animal = new Animal(position, new Genome(List.of(0,0,0,0)),MapDirection.EAST,10,0);
+        Animal animal = new Animal(position, new Genome(List.of(0,0,0,0)),MapDirection.EAST,10,0,0,0);
         Vector2d expectedPosition = new Vector2d(0,1);
 
         // when
@@ -138,7 +138,7 @@ public class GlobeWorldMapTest {
         Genome.setConfig(defaultGenomeConfig);
         GlobeWorldMap map = new GlobeWorldMap();
         Vector2d position = new Vector2d(1,9);
-        Animal animal = new Animal(position, new Genome(List.of(0,0,0,0)),MapDirection.NORTH,10,0);
+        Animal animal = new Animal(position, new Genome(List.of(0,0,0,0)),MapDirection.NORTH,10,0,0,0);
         MapDirection expectedOrientation = MapDirection.SOUTH;
 
         // when

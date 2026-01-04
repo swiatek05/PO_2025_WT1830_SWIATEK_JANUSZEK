@@ -11,6 +11,8 @@ import simulation.configs.MapConfig;
 
 import java.util.*;
 
+import static java.util.Collections.max;
+
 public class GlobeWorldMap implements WorldMap {
     private static MapConfig mapConfig;
     private final int MapWidth;
@@ -115,7 +117,7 @@ public class GlobeWorldMap implements WorldMap {
     public WorldElement objectAt(Vector2d position,int currentDay) {
         List<Animal> animals=animalsAt(position);
         if (animals!=null && !animals.isEmpty()){
-            return findStrongestAnimal(animals,currentDay);
+            return max(animals);
         }
         if(plantAt(position)!=null){
             return plantAt(position);
@@ -125,59 +127,59 @@ public class GlobeWorldMap implements WorldMap {
     }
 
     // public for now maybe will need to change it
-    public Animal findStrongestAnimal(List<Animal> animals,int currentDay) { //mozna sie zastanowic jak to zmienic bo troche brzydkie a petle sie powtarszaja prawie ze
-        List<Animal> strongestAnimals=new ArrayList<>();
-        int maxEnergy=-1;
-        for (Animal animal:animals){ //szukam max
-            if (animal.getEnergy()>maxEnergy){
-                maxEnergy=animal.getEnergy();
-            }
-        }
-        for (Animal animal:animals){ //szukam zwierzat z max
-            if (animal.getEnergy()==maxEnergy){
-                strongestAnimals.add(animal);
-            }
-        }
-        if  (strongestAnimals.size()==1){return strongestAnimals.get(0);} //sprawa rozszczygnieta
-
-
-        int maxAge=-1;
-        for  (Animal animal:strongestAnimals){
-            if (animal.getAge(currentDay)>maxAge){
-                maxAge=animal.getAge(currentDay);
-            }
-        }
-        List<Animal> tmp= new ArrayList<>();
-        for (Animal animal:strongestAnimals){
-            if (animal.getAge(currentDay)==maxAge){
-                tmp.add(animal);
-            }
-        }
-        strongestAnimals=tmp;
-        if (strongestAnimals.size()==1){return strongestAnimals.get(0);}
-
-
-        int maxChildCount=-1;
-        for  (Animal animal:strongestAnimals){
-            if (animal.getChildrenCount()>maxChildCount){
-                maxChildCount=animal.getChildrenCount();
-            }
-        }
-        tmp= new ArrayList<>();
-        for (Animal animal:strongestAnimals){
-            if (animal.getChildrenCount()==maxChildCount){
-                tmp.add(animal);
-            }
-        }
-        strongestAnimals=tmp;
-        if (strongestAnimals.size()==1){
-            return strongestAnimals.get(0);
-        }
-        else{
-            int randomIdx=(int)(Math.random()*strongestAnimals.size());
-            return strongestAnimals.get(randomIdx);
-        }
-    }
+//    public Animal findStrongestAnimal(List<Animal> animals,int currentDay) { //mozna sie zastanowic jak to zmienic bo troche brzydkie a petle sie powtarszaja prawie ze
+//        List<Animal> strongestAnimals=new ArrayList<>();
+//        int maxEnergy=-1;
+//        for (Animal animal:animals){ //szukam max
+//            if (animal.getEnergy()>maxEnergy){
+//                maxEnergy=animal.getEnergy();
+//            }
+//        }
+//        for (Animal animal:animals){ //szukam zwierzat z max
+//            if (animal.getEnergy()==maxEnergy){
+//                strongestAnimals.add(animal);
+//            }
+//        }
+//        if  (strongestAnimals.size()==1){return strongestAnimals.get(0);} //sprawa rozszczygnieta
+//
+//
+//        int maxAge=-1;
+//        for  (Animal animal:strongestAnimals){
+//            if (animal.getAge(currentDay)>maxAge){
+//                maxAge=animal.getAge(currentDay);
+//            }
+//        }
+//        List<Animal> tmp= new ArrayList<>();
+//        for (Animal animal:strongestAnimals){
+//            if (animal.getAge(currentDay)==maxAge){
+//                tmp.add(animal);
+//            }
+//        }
+//        strongestAnimals=tmp;
+//        if (strongestAnimals.size()==1){return strongestAnimals.get(0);}
+//
+//
+//        int maxChildCount=-1;
+//        for  (Animal animal:strongestAnimals){
+//            if (animal.getChildrenCount()>maxChildCount){
+//                maxChildCount=animal.getChildrenCount();
+//            }
+//        }
+//        tmp= new ArrayList<>();
+//        for (Animal animal:strongestAnimals){
+//            if (animal.getChildrenCount()==maxChildCount){
+//                tmp.add(animal);
+//            }
+//        }
+//        strongestAnimals=tmp;
+//        if (strongestAnimals.size()==1){
+//            return strongestAnimals.get(0);
+//        }
+//        else{
+//            int randomIdx=(int)(Math.random()*strongestAnimals.size());
+//            return strongestAnimals.get(randomIdx);
+//        }
+//    }
 
     @Override
     public void removeDeadAnimals(int currentDay) {
