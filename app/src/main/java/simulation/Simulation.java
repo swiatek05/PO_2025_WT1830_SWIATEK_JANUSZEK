@@ -42,7 +42,7 @@ public class Simulation implements Runnable {
         while (isRunning) {
 
             for (Animal animal : aliveAnimals) {
-                if (animal.isDead()) {
+                if (animal.getEnergy() < 0) {
                     animal.killOff(currentDay);
                     aliveAnimals.remove(animal);
                     deadAnimals.add(animal);
@@ -68,14 +68,14 @@ public class Simulation implements Runnable {
         }
     }
 
+    // maybe we could move this so that map handles it
     private void eatPlants() {
         for (AbstractPlant plant : this.map.getPlants().values()) {
             List <Animal> potentialAnimals = map.animalsAt(plant.getPosition());
             if(!potentialAnimals.isEmpty()) {
                 Animal strongest = map.findStrongestAnimal(potentialAnimals,currentDay);
                 strongest.eat(plant);
-                // we now need to remove the plant (easy) and then figure out if it was in the steppe or in the jungle
-                // and accordingly add a free space there
+                map.removePlantFromMap(plant);
             }
         }
     }

@@ -73,6 +73,7 @@ public class GlobeWorldMap implements WorldMap {
 
     }
 
+    // why is this used only once in the whole class? why are not using it in removeDeadAnimals?
     private void removeAnimalfromMap(Vector2d oldPosition, Animal animal) {
         List <Animal> animalList=this.animals.get(oldPosition);
         if (animalList!=null){
@@ -259,6 +260,20 @@ public class GlobeWorldMap implements WorldMap {
             }
         }
         return null;
+    }
+
+    public void removePlantFromMap(AbstractPlant plant) {
+        Vector2d plantPos = plant.getPosition();
+
+        if(this.plants.get(plantPos) != null) {
+            this.plants.remove(plant.getPosition());
+            if(plantPos.getY()>=jungleMinY && plantPos.getY()<=jungleMaxY) {
+                FreePlaceForPlantsJungle.add(plantPos);
+            }
+            else{
+                FreePlaceForPlantsSteppe.add(plantPos);
+            }
+        }
     }
 
     @Override
