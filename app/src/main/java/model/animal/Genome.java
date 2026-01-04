@@ -27,6 +27,13 @@ public class Genome {
         this.immunityPercentage = calculateImmunity(this.genes);
     }
 
+    // only used for testing
+    public Genome(List<Integer> genes) {
+        this.genes = genes;
+        this.currentGeneIndex = 0;
+        this.immunityPercentage = calculateImmunity(this.genes);
+    }
+
     // genome created when two animals mate, genes are a split between parents
     public Genome(Animal parent1, Animal parent2) {
         Random rn = new Random();
@@ -79,7 +86,7 @@ public class Genome {
     }
 
     public float calculateImmunity(List<Integer> genes) {
-        List<Integer> immunityGenes = genomeConfig.immunityGenome().getGenes();
+        List<Integer> immunityGenes = genomeConfig.immunityGenes();
         int matching = 0;
 
         for(int i = 0; i < genomeConfig.genomeLength(); i++) {

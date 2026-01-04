@@ -24,6 +24,7 @@ public class Simulation implements Runnable {
         Animal.setAnimalConfig(config.animalConfig());
         AbstractPlant.setPlantConfig(config.plantConfig());
         Genome.setConfig(config.genomeConfig());
+        GlobeWorldMap.setMapConfig(config.mapConfig());
 
         map.spawnPlants(config.startingPlantAmount());
 

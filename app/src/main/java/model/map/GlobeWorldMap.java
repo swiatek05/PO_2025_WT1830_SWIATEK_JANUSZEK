@@ -7,10 +7,12 @@ import model.animal.Animal;
 import model.plant.AbstractPlant;
 import model.plant.Grass;
 import model.util.Boundary;
+import simulation.configs.MapConfig;
 
 import java.util.*;
 
 public class GlobeWorldMap implements WorldMap {
+    private static MapConfig mapConfig;
     private final int MapWidth;
     private final int MapHeight;
 
@@ -22,10 +24,13 @@ public class GlobeWorldMap implements WorldMap {
     private final int jungleMinY; //zakladadam ze włącznie
     private final int jungleMaxY;
 
+    public static void setMapConfig(MapConfig config) {
+        mapConfig = config;
+    }
 
-    public GlobeWorldMap(int MapWidth,int MapHeight) {
-        this.MapWidth=MapWidth;
-        this.MapHeight=MapHeight;
+    public GlobeWorldMap() {
+        this.MapWidth=mapConfig.MapWidth();
+        this.MapHeight=mapConfig.MapHeight();
         //ustawiam dzungle
         int jungleHeight=Math.max(1,(int) (MapHeight*0.2));
 
@@ -104,7 +109,7 @@ public class GlobeWorldMap implements WorldMap {
         return animals!=null && !animals.isEmpty();
     }
 
-    // i don't really see a use for this method
+    // i don't really see a use for this method (or idk I will use it for tests)
     @Override
     public WorldElement objectAt(Vector2d position,int currentDay) {
         List<Animal> animals=animalsAt(position);
@@ -275,6 +280,8 @@ public class GlobeWorldMap implements WorldMap {
     public boolean canMoveTo(Vector2d position) {
         return false;
     }
+
+    // why is this seperate from place, if place just calls this method?
     private void addAnimalToMap(Vector2d position,Animal animal) {
         if (!animals.containsKey(position)){
             animals.put(position,new ArrayList<>());
