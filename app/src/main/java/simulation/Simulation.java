@@ -113,4 +113,9 @@ public class Simulation implements Runnable {
     public List<Animal> getAliveAnimals() {
         return aliveAnimals;
     }
+
+    // for testing
+    public void addAnimalToAlive(Animal animal) {
+        this.aliveAnimals.add(animal);
+    }
 }

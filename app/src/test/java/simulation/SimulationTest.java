@@ -38,6 +38,10 @@ public class SimulationTest {
         map.place(animal2);
         map.place(animal3);
 
+        simulation.addAnimalToAlive(animal1);
+        simulation.addAnimalToAlive(animal2);
+        simulation.addAnimalToAlive(animal3);
+
         // when
         simulation.removeDeadAnimals();
 

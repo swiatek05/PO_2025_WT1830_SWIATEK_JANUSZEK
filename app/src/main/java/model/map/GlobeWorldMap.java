@@ -127,7 +127,7 @@ public class GlobeWorldMap implements WorldMap {
 
     }
 
-    // public for now maybe will need to change it
+    // simpler implementation of this method was made as compareTo in Animal
 //    public Animal findStrongestAnimal(List<Animal> animals,int currentDay) { //mozna sie zastanowic jak to zmienic bo troche brzydkie a petle sie powtarszaja prawie ze
 //        List<Animal> strongestAnimals=new ArrayList<>();
 //        int maxEnergy=-1;
