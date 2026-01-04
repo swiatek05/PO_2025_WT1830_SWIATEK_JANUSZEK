@@ -84,10 +84,29 @@ public class Simulation implements Runnable {
     }
 
     private void mateAnimals() {
-        // Animal strongest = max(aliveAnimals);
+        for (Animal animal : this.getAliveAnimals()) {
+            List <Animal> animalsToMate = map.animalsAt(animal.getPosition());
+            Collections.sort(animalsToMate);
+
+            if (animalsToMate.size() > 1) {
+                for (int i = 1; i < animalsToMate.size(); i+=2) {
+                    Animal parent1 = animalsToMate.get(i);
+                    Animal parent2 = animalsToMate.get(i-1);
+                    // need to check if animals have enough energy to mate but that is stored in AnimalConfig
+                    Animal child = parent1.mate(parent2,this.currentDay);
+
+                    map.place(animal);
+                    this.aliveAnimals.add(animal);
+                }
+            }
+        }
     }
 
     private void growPlants() {
         map.spawnPlants(simulationConfig.plantCountToGrowEveryday());
+    }
+
+    public List<Animal> getAliveAnimals() {
+        return aliveAnimals;
     }
 }
