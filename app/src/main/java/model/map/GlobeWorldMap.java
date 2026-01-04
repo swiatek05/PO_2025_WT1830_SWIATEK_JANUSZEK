@@ -310,4 +310,9 @@ public class GlobeWorldMap implements WorldMap {
     public Map<Vector2d, AbstractPlant> getPlants() {
         return plants;
     }
+
+    // only usef for testing
+    public void addPlant(AbstractPlant plant) {
+        this.plants.put(plant.getPosition(),plant);
+    }
 }

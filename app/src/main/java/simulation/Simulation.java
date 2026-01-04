@@ -73,8 +73,10 @@ public class Simulation implements Runnable {
     }
 
     // maybe we could move this so that map handles it
-    private void eatPlants() {
-        for (AbstractPlant plant : this.map.getPlants().values()) {
+    public void eatPlants() {
+        // this probably should be changed idk (concurent modification idk how to fix differently)
+        Collection<AbstractPlant> plants = List.copyOf(this.map.getPlants().values());
+        for (AbstractPlant plant : plants) {
             List <Animal> potentialAnimals = map.animalsAt(plant.getPosition());
             if(!potentialAnimals.isEmpty()) {
                 Animal strongest = max(potentialAnimals);
