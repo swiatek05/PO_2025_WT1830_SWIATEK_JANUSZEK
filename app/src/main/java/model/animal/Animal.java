@@ -5,10 +5,12 @@ import model.Vector2d;
 import model.WorldElement;
 import model.map.GlobeWorldMap;
 import model.plant.AbstractPlant;
-import model.util.MoveValidator;
+import org.jspecify.annotations.NonNull;
 import simulation.configs.AnimalConfig;
 
-public class Animal implements WorldElement {
+import java.util.Comparator;
+
+public class Animal implements WorldElement, Comparable<Animal>{
     private MapDirection orientation;
     private Vector2d position;
     private int energy;
@@ -148,5 +150,10 @@ public class Animal implements WorldElement {
 
     public boolean isAt(Vector2d position) {
         return this.position.equals(position);
+    }
+
+    @Override
+    public int compareTo(@NonNull Animal o) {
+        return Comparator.comparing(Animal::getEnergy).thenComparing(Animal::getAge).thenComparing(Animal::getChildrenCount).compare(this,o);
     }
 }

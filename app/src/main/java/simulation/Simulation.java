@@ -9,6 +9,9 @@ import simulation.configs.SimulationConfig;
 
 import java.util.*;
 
+import static java.util.Collections.max;
+import static java.util.Collections.sort;
+
 public class Simulation implements Runnable {
     private final GlobeWorldMap map;
     private final SimulationConfig simulationConfig;
@@ -81,7 +84,7 @@ public class Simulation implements Runnable {
     }
 
     private void mateAnimals() {
-
+        // Animal strongest = max(aliveAnimals);
     }
 
     private void growPlants() {
