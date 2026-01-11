@@ -13,29 +13,22 @@ import static java.util.Collections.max;
 
 public class Simulation implements Runnable {
     private final GlobeWorldMap map;
-    private static SimulationConfig simulationConfig;
+    private  SimulationConfig simulationConfig;
     private List<Animal> aliveAnimals = new ArrayList<>();
     private List<Animal> deadAnimals = new ArrayList<>();
     private boolean isRunning = true;
     private int currentDay = 0;
 
-    public static void setConfig(SimulationConfig config) {
-        simulationConfig = config;
-        Animal.setAnimalConfig(simulationConfig.animalConfig());
-        AbstractPlant.setPlantConfig(simulationConfig.plantConfig());
-        Genome.setConfig(simulationConfig.genomeConfig());
-        GlobeWorldMap.setMapConfig(simulationConfig.mapConfig());
-    }
-
-    public Simulation(GlobeWorldMap map) {
+    public Simulation(GlobeWorldMap map,SimulationConfig simulationConfig) {
         this.map = map;
+        this.simulationConfig=simulationConfig;
 
         map.spawnPlants(simulationConfig.startingPlantAmount());
 
         Random rn = new Random();
         for (int i = 0; i < simulationConfig.startingAnimalAmount(); i++) {
             Vector2d position = new Vector2d(rn.nextInt(map.getMapWidth()), rn.nextInt(map.getMapHeight()));
-            Animal animal = new Animal(position, this.currentDay);
+            Animal animal = new Animal(position, this.currentDay,simulationConfig.animalConfig(),simulationConfig.genomeConfig());
             map.place(animal);
             this.aliveAnimals.add(animal);
         }
@@ -44,12 +37,13 @@ public class Simulation implements Runnable {
     @Override
     public void run() {
         while (isRunning) {
-
-            for (Animal animal : aliveAnimals) {
-                if (animal.getEnergy() < 0) {
+            Iterator<Animal> it=aliveAnimals.iterator();
+            while (it.hasNext()) {
+                Animal animal=it.next();
+                if (animal.getEnergy()<=0){
                     animal.killOff(currentDay);
-                    aliveAnimals.remove(animal);
                     deadAnimals.add(animal);
+                    it.remove();
                 }
             }
 
@@ -58,6 +52,7 @@ public class Simulation implements Runnable {
             eatPlants();
             mateAnimals();
             growPlants();
+            map.mapChanged("Dzień: "+currentDay);
             currentDay++;
         }
     }
@@ -75,7 +70,7 @@ public class Simulation implements Runnable {
     // maybe we could move this so that map handles it
     public void eatPlants() {
         // this probably should be changed idk (concurent modification idk how to fix differently)
-        Collection<AbstractPlant> plants = List.copyOf(this.map.getPlants().values());
+        /*Collection<AbstractPlant> plants = List.copyOf(this.map.getPlants().values());
         for (AbstractPlant plant : plants) {
             List <Animal> potentialAnimals = map.animalsAt(plant.getPosition());
             if(!potentialAnimals.isEmpty()) {
@@ -83,11 +78,12 @@ public class Simulation implements Runnable {
                 strongest.eat(plant);
                 map.removePlantFromMap(plant);
             }
-        }
+        }*/
+        map.eatPlants();
     }
 
     private void mateAnimals() {
-        for (Animal animal : this.getAliveAnimals()) {
+        /*for (Animal animal : this.getAliveAnimals()) {
             List <Animal> animalsToMate = map.animalsAt(animal.getPosition());
             Collections.sort(animalsToMate);
 
@@ -105,7 +101,9 @@ public class Simulation implements Runnable {
                     }
                 }
             }
-        }
+        }*/
+        List<Animal> newAnimals =map.reproduce(currentDay);
+        aliveAnimals.addAll(newAnimals);
     }
 
     private void growPlants() {
@@ -116,7 +114,7 @@ public class Simulation implements Runnable {
         return aliveAnimals;
     }
 
-    // for testing
+
     public void addAnimalToAlive(Animal animal) {
         this.aliveAnimals.add(animal);
     }

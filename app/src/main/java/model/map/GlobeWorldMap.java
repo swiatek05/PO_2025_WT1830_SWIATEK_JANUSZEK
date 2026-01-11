@@ -6,17 +6,25 @@ import model.WorldElement;
 import model.animal.Animal;
 import model.plant.AbstractPlant;
 import model.plant.Grass;
+import model.plant.PoisonGrass;
 import model.util.Boundary;
+import model.util.MapException;
+import simulation.SimulationVariant;
 import simulation.configs.MapConfig;
+import simulation.configs.PlantConfig;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static java.util.Collections.max;
 
+
 public class GlobeWorldMap implements WorldMap {
-    private static MapConfig mapConfig;
+    private final MapConfig mapConfig;
+    private final PlantConfig plantConfig;
     private final int MapWidth;
     private final int MapHeight;
+    private final SimulationVariant simulationVariant;
 
     private final Map<Vector2d, List<Animal>> animals= new HashMap<>();
     private final Map<Vector2d, AbstractPlant> plants=new HashMap<>();
@@ -26,14 +34,18 @@ public class GlobeWorldMap implements WorldMap {
     private final int jungleMinY; //zakladadam ze włącznie
     private final int jungleMaxY;
 
-    // only for testing
-    public static void setMapConfig(MapConfig config) {
-        mapConfig = config;
-    }
+    private final List<MapChangeListener> observers=new ArrayList<>();
+    private final int id;
+    private static final AtomicInteger IdCounter= new AtomicInteger(0);
 
-    public GlobeWorldMap() {
+
+    public GlobeWorldMap(MapConfig mapConfig,PlantConfig plantConfig) {
         this.MapWidth=mapConfig.MapWidth();
         this.MapHeight=mapConfig.MapHeight();
+        this.mapConfig=mapConfig;
+        this.plantConfig=plantConfig;
+        this.id=IdCounter.getAndIncrement();
+        this.simulationVariant=mapConfig.simulationVariant();
         //ustawiam dzungle
         int jungleHeight=Math.max(1,(int) (MapHeight*0.2));
 
@@ -52,10 +64,11 @@ public class GlobeWorldMap implements WorldMap {
             }
         }
     }
-
+    @Override
     public int getMapWidth() {
         return MapWidth;
     }
+    @Override
     public int getMapHeight() {
         return MapHeight;
     }
@@ -207,13 +220,12 @@ public class GlobeWorldMap implements WorldMap {
     @Override
     public void spawnPlants(int countPlants) {
         for(int i=0;i<countPlants;i++){
-            double randomNumber=Math.random();
+            double jungleOrSteppe=Math.random();
             Vector2d position=null;
-            if (randomNumber<=0.8){
+            if (jungleOrSteppe<=0.8){
                 position=findFreePositionInJungle();
                 if (position==null){
                     position=findFreePositionInSteppe();
-
                 }
             }
             else{
@@ -223,9 +235,19 @@ public class GlobeWorldMap implements WorldMap {
                 }
             }
             if (position!=null){
-                plants.put(position,new Grass(position));
-                FreePlaceForPlantsJungle.remove(position);
-                FreePlaceForPlantsSteppe.remove(position);
+                AbstractPlant plant;
+                if (simulationVariant==SimulationVariant.STANDARD){
+                    plant=new Grass(position,plantConfig);
+                }
+                else {
+                    double edibleOrPoison=Math.random();
+                    if (edibleOrPoison <= plantConfig.poisonPlantChance())
+                        plant = new PoisonGrass(position, plantConfig);
+                    else
+                        plant = new Grass(position, plantConfig);
+
+                }
+                addPlant(plant);
 
             }
             else{
@@ -281,22 +303,23 @@ public class GlobeWorldMap implements WorldMap {
 
     @Override
     public Boundary getCurrentBounds() {
-        return null;
+        return new Boundary(new Vector2d(0,0),new Vector2d(MapWidth-1,MapHeight-1));
     }
 
     @Override
     public int getId() {
-        return 0;
+        return id;
     }
 
     @Override
     public void addObserver(MapChangeListener observer) {
+        observers.add(observer);
 
     }
-
-    @Override
-    public boolean canMoveTo(Vector2d position) {
-        return false;
+    public void mapChanged(String message){
+        for (MapChangeListener observer : observers) {
+            observer.mapChanged(this,message);
+        }
     }
 
     // why is this seperate from place, if place just calls this method?
@@ -311,8 +334,62 @@ public class GlobeWorldMap implements WorldMap {
         return plants;
     }
 
-    // only usef for testing
+
     public void addPlant(AbstractPlant plant) {
-        this.plants.put(plant.getPosition(),plant);
+        Vector2d position=plant.getPosition();
+        Boundary boundary=getCurrentBounds();
+        if (!(position.precedes(boundary.maxRightPosition()) && position.follows(boundary.minLeftPosition()))){
+            throw new MapException("Position " + position + " is outside the map boundaries.");
+        }
+        plants.put(position,plant);
+        FreePlaceForPlantsJungle.remove(position);
+        FreePlaceForPlantsSteppe.remove(position);
+    }
+    @Override
+    public void eatPlants(){
+        Set<Vector2d> plantPositions=new HashSet<>(plants.keySet());
+        for (Vector2d position : plantPositions) {
+            List <Animal> animalsOnPosition=animals.get(position);
+            if (animalsOnPosition!=null && !animalsOnPosition.isEmpty()){
+                Animal Strongest=Collections.max(animalsOnPosition);
+                AbstractPlant plant=plants.get(position);
+                Strongest.eat(plant);
+                removePlantFromMap(plant);
+            }
+
+        }
+    }
+    @Override
+    public List<Animal> reproduce(int currentDay){
+        Set <Vector2d> animalPositions=new HashSet<>(animals.keySet());
+        List <Animal> children=new ArrayList<>();
+        for (Vector2d position : animalPositions) {
+            List <Animal> animalsOnPosition=animals.get(position);
+            if (animalsOnPosition.size()<2) continue;
+
+            Animal Strongest=null;
+            Animal SecondStrongest=null;
+            for (Animal animal : animalsOnPosition) {
+                if (Strongest==null || animal.compareTo(Strongest)>0){
+                    SecondStrongest=Strongest;
+                    Strongest=animal;
+
+                }
+                else if (SecondStrongest==null || animal.compareTo(SecondStrongest)>0){
+                    SecondStrongest=animal;
+                }
+            }
+            if (Strongest!=null && SecondStrongest!=null && Strongest.canMate() && SecondStrongest.canMate() ){
+                Animal child=Strongest.mate(SecondStrongest,currentDay);
+                this.place(child);
+                children.add(child);
+
+
+            }
+        }
+        return children;
+
+
+
     }
 }

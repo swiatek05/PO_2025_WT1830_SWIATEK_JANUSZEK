@@ -6,11 +6,10 @@ import model.animal.Animal;
 import model.plant.AbstractPlant;
 import model.WorldElement;
 import model.util.Boundary;
-import model.util.MoveValidator;
 
 import java.util.List;
 
-public interface WorldMap extends MoveValidator {
+public interface WorldMap  {
     void place(Animal animal); //umieszcza zwierze na mapie
 
     void move(Animal animal); //przesuwa zwierze zgodnie z jego logika (czyli geny i orientacja)
@@ -32,4 +31,11 @@ public interface WorldMap extends MoveValidator {
     int getId(); //id (pisalo zeby wiele okien zrobic)
 
     void addObserver(MapChangeListener observer); //rejestracja obserwatora , zeby GUI wiedziało ze trzeba odswiezyc
+
+    void eatPlants();
+
+    List<Animal> reproduce(int currentDay);
+
+    int getMapWidth();
+    int getMapHeight();
 }

@@ -1,4 +1,6 @@
 package simulation.configs;
 
-public record MapConfig(int MapWidth, int MapHeight) {
+import simulation.SimulationVariant;
+
+public record MapConfig(int MapWidth, int MapHeight, SimulationVariant simulationVariant ) {
 }
