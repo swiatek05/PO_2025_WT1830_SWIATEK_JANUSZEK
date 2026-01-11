@@ -7,6 +7,7 @@ import model.map.GlobeWorldMap;
 import model.plant.AbstractPlant;
 import org.jspecify.annotations.NonNull;
 import simulation.configs.AnimalConfig;
+import simulation.configs.GenomeConfig;
 
 import java.util.Comparator;
 import java.util.Objects;
@@ -16,29 +17,31 @@ public class Animal implements WorldElement, Comparable<Animal>{
     private Vector2d position;
     private int energy;
     private final Genome genome;
-    private static AnimalConfig animalConfig;
+    private final AnimalConfig animalConfig;
+    private final GenomeConfig genomeConfig;
     private int dayOfDeath = -1;
     private int age = 0;
     private final int birthDay;
     private int childCount = 0;
 
-    // only for testing
-    public static void setAnimalConfig(AnimalConfig config) {
-        animalConfig = config;
-    }
+
 
     // initial animals created at the start of simulation
-    public Animal(Vector2d position,int currentDay) {
+    public Animal(Vector2d position,int currentDay,AnimalConfig animalConfig, GenomeConfig genomeConfig) {
         this.position = position;
+        this.animalConfig = animalConfig;
+        this.genomeConfig = genomeConfig;
         this.energy = animalConfig.startEnergy();
-        this.genome = new Genome();
+        this.genome = new Genome(genomeConfig);
         this.orientation = MapDirection.getRandomDirection();
         this.birthDay = currentDay;
     }
 
     // create animal by mating
-    public Animal(Vector2d position, Genome genome,int currentDay) {
+    public Animal(Vector2d position, Genome genome,int currentDay,AnimalConfig animalConfig, GenomeConfig genomeConfig) {
         this.position = position;
+        this.animalConfig = animalConfig;
+        this.genomeConfig = genomeConfig;
         this.energy = animalConfig.energyUsedToMate() * 2;
         this.genome = genome;
         this.orientation = MapDirection.getRandomDirection();
@@ -46,7 +49,9 @@ public class Animal implements WorldElement, Comparable<Animal>{
     }
 
     // only used for testing
-    public Animal(Vector2d position, Genome genome, MapDirection orientation, int energy, int currentDay, int childCount, int age) {
+    public Animal(Vector2d position, Genome genome, MapDirection orientation, int energy, int currentDay, int childCount, int age, AnimalConfig animalConfig, GenomeConfig genomeConfig) {
+        this.animalConfig = animalConfig;
+        this.genomeConfig = genomeConfig;
         this.position = position;
         this.energy = energy;
         this.genome = genome;
@@ -59,16 +64,17 @@ public class Animal implements WorldElement, Comparable<Animal>{
     public int getAge() {
         return this.age;
     }
+    public int getAgeForDead() { return dayOfDeath; }
 
     // mating behaviour
     public Animal mate(Animal partner,int currentDay) {
-        Genome childGenome = new Genome(this, partner);
+        Genome childGenome = new Genome(this, partner,this.genomeConfig);
         this.decreaseEnergyMating();
         partner.decreaseEnergyMating();
         this.childCount++;
         partner.childCount++;
 
-        return new Animal(this.position,childGenome,currentDay);
+        return new Animal(this.position,childGenome,currentDay,animalConfig,genomeConfig);
     }
 
     public void move(GlobeWorldMap map) {
@@ -101,7 +107,7 @@ public class Animal implements WorldElement, Comparable<Animal>{
 
     public void eat(AbstractPlant plant) {
         if (plant.getConsumptionEnergy() < 0) {
-            this.energy += (int) (plant.getConsumptionEnergy() * genome.getImmunityPercentage());
+            this.energy += (int) (plant.getConsumptionEnergy() * (1-genome.getImmunityPercentage()));
         } else {
             this.energy += plant.getConsumptionEnergy();
         }
@@ -174,7 +180,7 @@ public class Animal implements WorldElement, Comparable<Animal>{
     }
 
     // i'm not sure about this
-    public static int getEnergyNeededToMate() {
+    public int getEnergyNeededToMate() {
         return animalConfig.energyUsedToMate();
     }
 }
