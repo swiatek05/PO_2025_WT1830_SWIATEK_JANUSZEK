@@ -14,14 +14,19 @@ import static java.util.Collections.max;
 public class Simulation implements Runnable {
     private final GlobeWorldMap map;
     private  SimulationConfig simulationConfig;
+    private SimulationPresenter presenter;
     private List<Animal> aliveAnimals = new ArrayList<>();
     private List<Animal> deadAnimals = new ArrayList<>();
     private boolean isRunning = true;
+    private volatile boolean isPaused = false;
     private int currentDay = 0;
+    private final int MOVE_DELAY = 300;
+    private final SimulationStatistics statistics=new SimulationStatistics();
 
-    public Simulation(GlobeWorldMap map,SimulationConfig simulationConfig) {
+    public Simulation(GlobeWorldMap map,SimulationConfig simulationConfig,SimulationPresenter presenter) {
         this.map = map;
         this.simulationConfig=simulationConfig;
+        this.presenter=presenter;
 
         map.spawnPlants(simulationConfig.startingPlantAmount());
 
@@ -36,25 +41,61 @@ public class Simulation implements Runnable {
 
     @Override
     public void run() {
+
         while (isRunning) {
-            Iterator<Animal> it=aliveAnimals.iterator();
-            while (it.hasNext()) {
-                Animal animal=it.next();
-                if (animal.getEnergy()<=0){
-                    animal.killOff(currentDay);
-                    deadAnimals.add(animal);
-                    it.remove();
+            if (isPaused) {
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
                 }
+                continue;
             }
 
+            killStarvedAnimals();
             removeDeadAnimals();
             moveAnimals();
             eatPlants();
             mateAnimals();
             growPlants();
-            map.mapChanged("Dzień: "+currentDay);
+            //map.mapChanged("Dzień: "+currentDay);
+
+            statistics.update(aliveAnimals,map.getPlantsCount(),map.getFreeFields(),deadAnimals);
+            if (presenter != null) {
+                presenter.mapChanged(currentDay);
+            }
             currentDay++;
+            if(presenter != null) {
+                try {
+                    Thread.sleep(MOVE_DELAY);
+                } catch (InterruptedException e) {
+                    System.out.println("Wątek symulacji przerwany");
+                    break;
+                }
+            }
         }
+    }
+    void killStarvedAnimals() {
+        Iterator<Animal> it=aliveAnimals.iterator();
+        while (it.hasNext()) {
+            Animal animal=it.next();
+            if (animal.getEnergy()<=0){
+                animal.killOff(currentDay);
+                deadAnimals.add(animal);
+                it.remove();
+            }
+        }
+    }
+    public void pause() {
+        isPaused = true;
+    }
+
+    public void resume() {
+        isPaused = false;
+    }
+
+    public void stop() {
+        isRunning = false;
     }
 
     public void removeDeadAnimals() {
@@ -117,5 +158,9 @@ public class Simulation implements Runnable {
 
     public void addAnimalToAlive(Animal animal) {
         this.aliveAnimals.add(animal);
+    }
+    public SimulationStatistics getStatistics(){
+        return statistics;
+
     }
 }

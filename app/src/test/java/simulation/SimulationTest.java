@@ -26,7 +26,8 @@ public class SimulationTest {
 
 
         GlobeWorldMap map = new GlobeWorldMap(defaultMapConfig,defaultPlantConfig);
-        Simulation simulation = new Simulation(map,defaultSimulationConfig);
+
+        Simulation simulation = new Simulation(map,defaultSimulationConfig,null);
         Genome genome = new Genome(defaultGenomeConfig);
         Vector2d position1 = new Vector2d(1,1);
         Vector2d position2 = new Vector2d(2,2);
@@ -44,6 +45,7 @@ public class SimulationTest {
         simulation.addAnimalToAlive(animal3);
 
         // when
+        simulation.killStarvedAnimals();
         simulation.removeDeadAnimals();
 
         // then
@@ -63,7 +65,8 @@ public class SimulationTest {
 
 
         GlobeWorldMap map = new GlobeWorldMap(defaultMapConfig,defaultPlantConfig);
-        Simulation simulation = new Simulation(map,defaultSimulationConfig);
+
+        Simulation simulation = new Simulation(map,defaultSimulationConfig,null);
         Genome genome = new Genome(defaultGenomeConfig);
         Vector2d position1 = new Vector2d(1,1);
         Vector2d position2 = new Vector2d(2,2);

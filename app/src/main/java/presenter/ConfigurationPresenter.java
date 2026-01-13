@@ -2,13 +2,17 @@ package presenter;
 
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Spinner;
-import javafx.scene.control.TextField;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.scene.control.*;
+import javafx.stage.Stage;
+import simulation.Simulation;
+import simulation.SimulationPresenter;
 import simulation.SimulationVariant;
 import simulation.configs.*;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -31,13 +35,19 @@ public class ConfigurationPresenter {
     @FXML private Spinner<Integer> maxMutationsSpinner;
     @FXML private TextField genome;
 
+    private int simulationId=0;
+
     @FXML
     public void initialize() {
         variantComboBox.setItems(FXCollections.observableArrayList(SimulationVariant.values()));
         variantComboBox.getSelectionModel().selectFirst();
-        javafx.scene.control.SpinnerValueFactory<Double> poisonFactory =
-                new javafx.scene.control.SpinnerValueFactory.DoubleSpinnerValueFactory(0.0, 1.0, 0.1, 0.05);
+        SpinnerValueFactory<Double> poisonFactory =
+                new SpinnerValueFactory.DoubleSpinnerValueFactory(0.0, 1.0, 0.1, 0.05);
         plantPoisonChangeSpinner.setValueFactory(poisonFactory);
+
+        SpinnerValueFactory<Integer> damageFactory =
+                new SpinnerValueFactory.IntegerSpinnerValueFactory(Integer.MIN_VALUE, 0, -10);
+        plantPoisonDamageSpinner.setValueFactory(damageFactory);
     }
 
     @FXML
@@ -62,6 +72,7 @@ public class ConfigurationPresenter {
             showError("Geny muszą być liczbami rozdzielonymi przecinkami!");
             return;
         }
+
         AnimalConfig animalConfig = new AnimalConfig(
                 startEnergySpinner.getValue(),
                 dayEndEnergyLossSpinner.getValue(),
@@ -95,14 +106,29 @@ public class ConfigurationPresenter {
                 dailyGrowthSpinner.getValue()
         );
 
-        System.out.println("--- NOWA SYMULACJA ---");
-        //System.out.println("Wariant: " + config.variant());
-        //System.out.println("Rozmiar mapy: " + mapConfig.width() + "x" + mapConfig.height());
-        System.out.println("Geny odporności: " + genomeConfig.immunityGenes());
-        System.out.println("Pełna konfiguracja: " + config);
-        //here initializate simulation
+       openSimulation(config);
 
     }
+
+    private void openSimulation(SimulationConfig config) {
+        try{
+            FXMLLoader loader=new FXMLLoader(getClass().getResource("/simulation.fxml"));
+            javafx.scene.Parent root = loader.load();
+
+            SimulationPresenter presenter=loader.getController();
+            presenter.setWorldConfig(config);
+            Stage simulationStage=new Stage();
+            simulationId++;
+            simulationStage.setTitle("Symulacja ID: "+ simulationId);
+            simulationStage.setScene(new Scene(root));
+            simulationStage.show();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            showError("Nie udało się otworzyć symulacji"+e.getMessage());
+        }
+    }
+
     private void showError(String message) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle("Błąd konfiguracji");

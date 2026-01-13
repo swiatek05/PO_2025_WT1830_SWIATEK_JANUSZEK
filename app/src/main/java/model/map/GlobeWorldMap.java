@@ -26,48 +26,49 @@ public class GlobeWorldMap implements WorldMap {
     private final int MapHeight;
     private final SimulationVariant simulationVariant;
 
-    private final Map<Vector2d, List<Animal>> animals= new HashMap<>();
-    private final Map<Vector2d, AbstractPlant> plants=new HashMap<>();
-    private final Set<Vector2d> FreePlaceForPlantsJungle=new HashSet<>();
-    private final Set<Vector2d> FreePlaceForPlantsSteppe=new HashSet<>();
+    private final Map<Vector2d, List<Animal>> animals = new HashMap<>();
+    private final Map<Vector2d, AbstractPlant> plants = new HashMap<>();
+    private final Set<Vector2d> FreePlaceForPlantsJungle = new HashSet<>();
+    private final Set<Vector2d> FreePlaceForPlantsSteppe = new HashSet<>();
 
     private final int jungleMinY; //zakladadam ze włącznie
     private final int jungleMaxY;
 
-    private final List<MapChangeListener> observers=new ArrayList<>();
+    private final List<MapChangeListener> observers = new ArrayList<>();
     private final int id;
-    private static final AtomicInteger IdCounter= new AtomicInteger(0);
+    private static final AtomicInteger IdCounter = new AtomicInteger(0);
 
 
-    public GlobeWorldMap(MapConfig mapConfig,PlantConfig plantConfig) {
-        this.MapWidth=mapConfig.MapWidth();
-        this.MapHeight=mapConfig.MapHeight();
-        this.mapConfig=mapConfig;
-        this.plantConfig=plantConfig;
-        this.id=IdCounter.getAndIncrement();
-        this.simulationVariant=mapConfig.simulationVariant();
+    public GlobeWorldMap(MapConfig mapConfig, PlantConfig plantConfig) {
+        this.MapWidth = mapConfig.MapWidth();
+        this.MapHeight = mapConfig.MapHeight();
+        this.mapConfig = mapConfig;
+        this.plantConfig = plantConfig;
+        this.id = IdCounter.getAndIncrement();
+        this.simulationVariant = mapConfig.simulationVariant();
         //ustawiam dzungle
-        int jungleHeight=Math.max(1,(int) (MapHeight*0.2));
+        int jungleHeight = Math.max(1, (int) (MapHeight * 0.2));
 
-        this.jungleMinY=(MapHeight-jungleHeight)/2;
-        this.jungleMaxY=jungleMinY+jungleHeight-1; //liczymy od 0
+        this.jungleMinY = (MapHeight - jungleHeight) / 2;
+        this.jungleMaxY = jungleMinY + jungleHeight - 1; //liczymy od 0
         //ustawiam wolne miejsca dla dzungli
-        for(int x=0;x<MapWidth;x++){
-            for(int y=0;y<MapHeight;y++){
-                if(y>=jungleMinY && y<=jungleMaxY) {
+        for (int x = 0; x < MapWidth; x++) {
+            for (int y = 0; y < MapHeight; y++) {
+                if (y >= jungleMinY && y <= jungleMaxY) {
                     FreePlaceForPlantsJungle.add(new Vector2d(x, y));
-                }
-                else{
+                } else {
                     FreePlaceForPlantsSteppe.add(new Vector2d(x, y));
                 }
 
             }
         }
     }
+
     @Override
     public int getMapWidth() {
         return MapWidth;
     }
+
     @Override
     public int getMapHeight() {
         return MapHeight;
@@ -76,25 +77,25 @@ public class GlobeWorldMap implements WorldMap {
 
     @Override
     public void place(Animal animal) {
-        addAnimalToMap(animal.getPosition(),animal);
+        addAnimalToMap(animal.getPosition(), animal);
     }
 
     @Override
     public void move(Animal animal) {
-        Vector2d oldPosition=animal.getPosition();
-        removeAnimalfromMap(oldPosition,animal);
+        Vector2d oldPosition = animal.getPosition();
+        removeAnimalfromMap(oldPosition, animal);
         animal.rotate();
         animal.move(this);
-        addAnimalToMap(animal.getPosition(),animal);
+        addAnimalToMap(animal.getPosition(), animal);
 
     }
 
     // why is this used only once in the whole class? why are not using it in removeDeadAnimals?
     private void removeAnimalfromMap(Vector2d oldPosition, Animal animal) {
-        List <Animal> animalList=this.animals.get(oldPosition);
-        if (animalList!=null){
+        List<Animal> animalList = this.animals.get(oldPosition);
+        if (animalList != null) {
             animalList.remove(animal);
-            if (animalList.isEmpty()){
+            if (animalList.isEmpty()) {
                 this.animals.remove(oldPosition);
             }
         }
@@ -103,11 +104,10 @@ public class GlobeWorldMap implements WorldMap {
 
     @Override
     public List<Animal> animalsAt(Vector2d position) {
-        List<Animal> animalsOnPosition=animals.get(position);
-        if (animalsOnPosition==null){
+        List<Animal> animalsOnPosition = animals.get(position);
+        if (animalsOnPosition == null) {
             return List.of();
-        }
-        else{
+        } else {
             return animalsOnPosition;
         }
     }
@@ -119,21 +119,24 @@ public class GlobeWorldMap implements WorldMap {
 
     @Override
     public boolean isOccupied(Vector2d position) {
-        if (plantAt(position)!=null){
+        if (plantAt(position) != null) {
             return true;
         }
-        List<Animal> animals=animalsAt(position);
-        return animals!=null && !animals.isEmpty();
+        List<Animal> animals = animalsAt(position);
+        return animals != null && !animals.isEmpty();
     }
 
     // i don't really see a use for this method (or idk I will use it for tests)
     @Override
-    public WorldElement objectAt(Vector2d position,int currentDay) {
-        List<Animal> animals=animalsAt(position);
-        if (animals!=null && !animals.isEmpty()){
-            return max(animals);
+    public WorldElement objectAt(Vector2d position, int currentDay) {
+        synchronized (animals) {
+            List<Animal> animals = animalsAt(position);
+            if (animals != null && !animals.isEmpty()) {
+                return max(animals);
+            }
         }
-        if(plantAt(position)!=null){
+
+        if (plantAt(position) != null) {
             return plantAt(position);
         }
         return null;
@@ -198,20 +201,19 @@ public class GlobeWorldMap implements WorldMap {
     @Override
     public void removeDeadAnimals(int currentDay) {
         Iterator<Map.Entry<Vector2d, List<Animal>>> it = animals.entrySet().iterator();
-        while (it.hasNext()){
-            Map.Entry<Vector2d,List<Animal>> entry=it.next();
-            List<Animal> animalsAtPosition=entry.getValue();
+        while (it.hasNext()) {
+            Map.Entry<Vector2d, List<Animal>> entry = it.next();
+            List<Animal> animalsAtPosition = entry.getValue();
 
-            Iterator <Animal> listIterator=animalsAtPosition.iterator();
-            while (listIterator.hasNext())
-            {
-                Animal animal=listIterator.next();
-                if (animal.getEnergy()<=0){
+            Iterator<Animal> listIterator = animalsAtPosition.iterator();
+            while (listIterator.hasNext()) {
+                Animal animal = listIterator.next();
+                if (animal.getEnergy() <= 0) {
                     animal.killOff(currentDay);
                     listIterator.remove();
                 }
             }
-            if (animalsAtPosition.isEmpty()){
+            if (animalsAtPosition.isEmpty()) {
                 it.remove();
             }
         }
@@ -219,28 +221,26 @@ public class GlobeWorldMap implements WorldMap {
 
     @Override
     public void spawnPlants(int countPlants) {
-        for(int i=0;i<countPlants;i++){
-            double jungleOrSteppe=Math.random();
-            Vector2d position=null;
-            if (jungleOrSteppe<=0.8){
-                position=findFreePositionInJungle();
-                if (position==null){
-                    position=findFreePositionInSteppe();
+        for (int i = 0; i < countPlants; i++) {
+            double jungleOrSteppe = Math.random();
+            Vector2d position = null;
+            if (jungleOrSteppe <= 0.8) {
+                position = findFreePositionInJungle();
+                if (position == null) {
+                    position = findFreePositionInSteppe();
+                }
+            } else {
+                position = findFreePositionInSteppe();
+                if (position == null) {
+                    position = findFreePositionInJungle();
                 }
             }
-            else{
-                position=findFreePositionInSteppe();
-                if (position==null){
-                    position=findFreePositionInJungle();
-                }
-            }
-            if (position!=null){
+            if (position != null) {
                 AbstractPlant plant;
-                if (simulationVariant==SimulationVariant.STANDARD){
-                    plant=new Grass(position,plantConfig);
-                }
-                else {
-                    double edibleOrPoison=Math.random();
+                if (simulationVariant == SimulationVariant.STANDARD) {
+                    plant = new Grass(position, plantConfig);
+                } else {
+                    double edibleOrPoison = Math.random();
                     if (edibleOrPoison <= plantConfig.poisonPlantChance())
                         plant = new PoisonGrass(position, plantConfig);
                     else
@@ -249,8 +249,7 @@ public class GlobeWorldMap implements WorldMap {
                 }
                 addPlant(plant);
 
-            }
-            else{
+            } else {
                 break;
             }
         }
@@ -258,30 +257,30 @@ public class GlobeWorldMap implements WorldMap {
     }
 
     private Vector2d findFreePositionInSteppe() {
-        if(!FreePlaceForPlantsSteppe.isEmpty()) {
-            Random random=new Random();
-            int idx=random.nextInt(FreePlaceForPlantsSteppe.size());
-            int i=0;
+        if (!FreePlaceForPlantsSteppe.isEmpty()) {
+            Random random = new Random();
+            int idx = random.nextInt(FreePlaceForPlantsSteppe.size());
+            int i = 0;
             for (Vector2d position : FreePlaceForPlantsSteppe) {
-                if (i==idx){
+                if (i == idx) {
                     return position;
                 }
-                i+=1;
+                i += 1;
             }
         }
         return null;
     }
 
     private Vector2d findFreePositionInJungle() {
-        if(!FreePlaceForPlantsJungle.isEmpty()) {
-            Random random=new Random();
-            int idx=random.nextInt(FreePlaceForPlantsJungle.size());
-            int i=0;
+        if (!FreePlaceForPlantsJungle.isEmpty()) {
+            Random random = new Random();
+            int idx = random.nextInt(FreePlaceForPlantsJungle.size());
+            int i = 0;
             for (Vector2d position : FreePlaceForPlantsJungle) {
-                if (i==idx){
+                if (i == idx) {
                     return position;
                 }
-                i+=1;
+                i += 1;
             }
         }
         return null;
@@ -290,12 +289,11 @@ public class GlobeWorldMap implements WorldMap {
     public void removePlantFromMap(AbstractPlant plant) {
         Vector2d plantPos = plant.getPosition();
 
-        if(this.plants.get(plantPos) != null) {
+        if (this.plants.get(plantPos) != null) {
             this.plants.remove(plant.getPosition());
-            if(plantPos.getY()>=jungleMinY && plantPos.getY()<=jungleMaxY) {
+            if (plantPos.getY() >= jungleMinY && plantPos.getY() <= jungleMaxY) {
                 FreePlaceForPlantsJungle.add(plantPos);
-            }
-            else{
+            } else {
                 FreePlaceForPlantsSteppe.add(plantPos);
             }
         }
@@ -303,7 +301,7 @@ public class GlobeWorldMap implements WorldMap {
 
     @Override
     public Boundary getCurrentBounds() {
-        return new Boundary(new Vector2d(0,0),new Vector2d(MapWidth-1,MapHeight-1));
+        return new Boundary(new Vector2d(0, 0), new Vector2d(MapWidth - 1, MapHeight - 1));
     }
 
     @Override
@@ -316,16 +314,17 @@ public class GlobeWorldMap implements WorldMap {
         observers.add(observer);
 
     }
-    public void mapChanged(String message){
+
+    public void mapChanged(String message) {
         for (MapChangeListener observer : observers) {
-            observer.mapChanged(this,message);
+            observer.mapChanged(this, message);
         }
     }
 
     // why is this seperate from place, if place just calls this method?
-    private void addAnimalToMap(Vector2d position,Animal animal) {
-        if (!animals.containsKey(position)){
-            animals.put(position,new ArrayList<>());
+    private void addAnimalToMap(Vector2d position, Animal animal) {
+        if (!animals.containsKey(position)) {
+            animals.put(position, new ArrayList<>());
         }
         animals.get(position).add(animal);
     }
@@ -336,51 +335,52 @@ public class GlobeWorldMap implements WorldMap {
 
 
     public void addPlant(AbstractPlant plant) {
-        Vector2d position=plant.getPosition();
-        Boundary boundary=getCurrentBounds();
-        if (!(position.precedes(boundary.maxRightPosition()) && position.follows(boundary.minLeftPosition()))){
+        Vector2d position = plant.getPosition();
+        Boundary boundary = getCurrentBounds();
+        if (!(position.precedes(boundary.maxRightPosition()) && position.follows(boundary.minLeftPosition()))) {
             throw new MapException("Position " + position + " is outside the map boundaries.");
         }
-        plants.put(position,plant);
+        plants.put(position, plant);
         FreePlaceForPlantsJungle.remove(position);
         FreePlaceForPlantsSteppe.remove(position);
     }
+
     @Override
-    public void eatPlants(){
-        Set<Vector2d> plantPositions=new HashSet<>(plants.keySet());
+    public void eatPlants() {
+        Set<Vector2d> plantPositions = new HashSet<>(plants.keySet());
         for (Vector2d position : plantPositions) {
-            List <Animal> animalsOnPosition=animals.get(position);
-            if (animalsOnPosition!=null && !animalsOnPosition.isEmpty()){
-                Animal Strongest=Collections.max(animalsOnPosition);
-                AbstractPlant plant=plants.get(position);
+            List<Animal> animalsOnPosition = animals.get(position);
+            if (animalsOnPosition != null && !animalsOnPosition.isEmpty()) {
+                Animal Strongest = Collections.max(animalsOnPosition);
+                AbstractPlant plant = plants.get(position);
                 Strongest.eat(plant);
                 removePlantFromMap(plant);
             }
 
         }
     }
+
     @Override
-    public List<Animal> reproduce(int currentDay){
-        Set <Vector2d> animalPositions=new HashSet<>(animals.keySet());
-        List <Animal> children=new ArrayList<>();
+    public List<Animal> reproduce(int currentDay) {
+        Set<Vector2d> animalPositions = new HashSet<>(animals.keySet());
+        List<Animal> children = new ArrayList<>();
         for (Vector2d position : animalPositions) {
-            List <Animal> animalsOnPosition=animals.get(position);
-            if (animalsOnPosition.size()<2) continue;
+            List<Animal> animalsOnPosition = animals.get(position);
+            if (animalsOnPosition.size() < 2) continue;
 
-            Animal Strongest=null;
-            Animal SecondStrongest=null;
+            Animal Strongest = null;
+            Animal SecondStrongest = null;
             for (Animal animal : animalsOnPosition) {
-                if (Strongest==null || animal.compareTo(Strongest)>0){
-                    SecondStrongest=Strongest;
-                    Strongest=animal;
+                if (Strongest == null || animal.compareTo(Strongest) > 0) {
+                    SecondStrongest = Strongest;
+                    Strongest = animal;
 
-                }
-                else if (SecondStrongest==null || animal.compareTo(SecondStrongest)>0){
-                    SecondStrongest=animal;
+                } else if (SecondStrongest == null || animal.compareTo(SecondStrongest) > 0) {
+                    SecondStrongest = animal;
                 }
             }
-            if (Strongest!=null && SecondStrongest!=null && Strongest.canMate() && SecondStrongest.canMate() ){
-                Animal child=Strongest.mate(SecondStrongest,currentDay);
+            if (Strongest != null && SecondStrongest != null && Strongest.canMate() && SecondStrongest.canMate()) {
+                Animal child = Strongest.mate(SecondStrongest, currentDay);
                 this.place(child);
                 children.add(child);
 
@@ -388,8 +388,13 @@ public class GlobeWorldMap implements WorldMap {
             }
         }
         return children;
+    }
 
+    public int getPlantsCount() {
+        return plants.size();
+    }
 
-
+    public int getFreeFields() {
+        return FreePlaceForPlantsSteppe.size() + FreePlaceForPlantsJungle.size();
     }
 }

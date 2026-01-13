@@ -29,6 +29,15 @@ dependencies {
     // This dependency is used by the application.
     implementation libs.guava
 }
+dependencies {
+    // Zamień 'libs.junit.jupiter' na konkretną wersję:
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.10.0'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.10.0'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+    // Zamień 'libs.guava' na:
+    implementation 'com.google.guava:guava:33.0.0-jre'
+}
 
 // Apply a specific Java toolchain to ease working on different environments.
 java {
@@ -41,8 +50,6 @@ application {
     // Define the main class for the application.
     mainClass = 'simulation.Main'
 }
-
-tasks.named('test') {
-    // Use JUnit Platform for unit tests.
+test{
     useJUnitPlatform()
 }
