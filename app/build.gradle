@@ -19,6 +19,9 @@ javafx {
     version = "21"
     modules = ['javafx.base', 'javafx.controls', 'javafx.fxml', 'javafx.graphics', 'javafx.media', 'javafx.swing', 'javafx.web']
 }
+dependencies {
+    implementation 'com.google.code.gson:gson:2.10.1'
+}
 
 dependencies {
     // Use JUnit Jupiter for testing.
