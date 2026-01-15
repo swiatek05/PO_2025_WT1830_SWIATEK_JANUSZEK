@@ -38,10 +38,10 @@
                 <Label text="Energia z rośliny:" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
                 <Spinner fx:id="plantEnergySpinner" initialValue="10" min="1" max="100" editable="true" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
 
-                <Label text="Obrażenia trucizny:" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+                <Label fx:id="plantPoisonDamageSpinnerLabel" text="Obrażenia trucizny:" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
                 <Spinner fx:id="plantPoisonDamageSpinner" initialValue="5" min="0" max="100" editable="true" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
 
-                <Label text="Szansa na truciznę (0.0-1.0):" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
+                <Label fx:id="plantPoisonChangeSpinnerLabel" text="Szansa na truciznę (0.0-1.0):" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
                 <Spinner fx:id="plantPoisonChangeSpinner" initialValue="0.1" min="0.0" max="1.0" amountToStepBy="0.05" editable="true" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
             </GridPane>
         </TitledPane>

@@ -28,7 +28,9 @@ public class ConfigurationPresenter {
     @FXML private Spinner<Integer> dailyGrowthSpinner;
     @FXML private Spinner<Integer> plantEnergySpinner;
     @FXML private Spinner<Integer> plantPoisonDamageSpinner;
+    @FXML private Label plantPoisonDamageSpinnerLabel;
     @FXML private Spinner<Double> plantPoisonChangeSpinner;
+    @FXML private Label plantPoisonChangeSpinnerLabel;
     @FXML private Spinner<Integer> startAnimalsCountSpinner;
     @FXML private Spinner<Integer> startEnergySpinner;
     @FXML private Spinner<Integer> dayEndEnergyLossSpinner;
@@ -53,7 +55,6 @@ public class ConfigurationPresenter {
         presetComboBox.setOnAction(e -> {
                     SimulationPreset preset = presetComboBox.getValue();
                     if (preset != null) {
-                        System.out.println(preset.simulationConfig());
                         applyPreset(preset.simulationConfig());
                     }
                 });
@@ -65,12 +66,18 @@ public class ConfigurationPresenter {
         SpinnerValueFactory<Integer> damageFactory =
                 new SpinnerValueFactory.IntegerSpinnerValueFactory(Integer.MIN_VALUE, 0, -10);
         plantPoisonDamageSpinner.setValueFactory(damageFactory);
+
+        variantComboBox.setOnAction(e -> {
+            SimulationVariant variant = variantComboBox.getValue();
+            setVisibilityOfPoison(variant);
+        });
     }
 
     private void applyPreset(SimulationConfig c) {
         widthSpinner.getValueFactory().setValue(c.mapConfig().MapWidth());
         heightSpinner.getValueFactory().setValue(c.mapConfig().MapHeight());
         variantComboBox.setValue(c.simulationVariant());
+        setVisibilityOfPoison(c.simulationVariant());
 
         startPlantsCountSpinner.getValueFactory().setValue(c.startingPlantAmount());
         dailyGrowthSpinner.getValueFactory().setValue(c.plantCountToGrowEveryday());
@@ -107,6 +114,32 @@ public class ConfigurationPresenter {
         );
     }
 
+    private void setVisibilityOfPoison(SimulationVariant variant) {
+        switch (variant) {
+            case STANDARD -> {
+                plantPoisonChangeSpinner.setVisible(false);
+                plantPoisonChangeSpinner.setManaged(false);
+                plantPoisonChangeSpinnerLabel.setVisible(false);
+                plantPoisonChangeSpinnerLabel.setManaged(false);
+
+                plantPoisonDamageSpinner.setVisible(false);
+                plantPoisonDamageSpinner.setManaged(false);
+                plantPoisonDamageSpinnerLabel.setVisible(false);
+                plantPoisonDamageSpinnerLabel.setManaged(false);
+            }
+            case POISONOUS_PLANTS -> {
+                plantPoisonChangeSpinner.setVisible(true);
+                plantPoisonChangeSpinner.setManaged(true);
+                plantPoisonChangeSpinnerLabel.setVisible(true);
+                plantPoisonChangeSpinnerLabel.setManaged(true);
+
+                plantPoisonDamageSpinner.setVisible(true);
+                plantPoisonDamageSpinner.setManaged(true);
+                plantPoisonDamageSpinnerLabel.setVisible(true);
+                plantPoisonDamageSpinnerLabel.setManaged(true);
+            }
+        }
+    }
 
     @FXML
     public void onStartSimulation() {
