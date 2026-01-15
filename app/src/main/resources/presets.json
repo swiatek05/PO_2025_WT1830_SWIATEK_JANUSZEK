@@ -1,0 +1,33 @@
+[
+  {
+    "name": "Domyślna symulacja",
+    "simulationConfig": {
+      "animalConfig": {
+        "startEnergy": 20,
+        "dayEndEnergyLoss": 1,
+        "ableToMateEnergyNeeded": 15,
+        "energyUsedToMate": 10
+      },
+      "genomeConfig": {
+        "genomeLength": 5,
+        "minMutateCount": 0,
+        "maxMutateCount": 2,
+        "immunityGenes": [1,2,3,4,5]
+      },
+      "plantConfig": {
+        "plantConsumptionEnergy": 10,
+        "plantPoisonConsumptionDamage": -10,
+        "poisonPlantChance": 0.1
+      },
+      "mapConfig": {
+        "MapWidth": 50,
+        "MapHeight": 50,
+        "simulationVariant": "STANDARD"
+      },
+      "simulationVariant": "STANDARD",
+      "startingPlantAmount": 50,
+      "startingAnimalAmount": 20,
+      "plantCountToGrowEveryday": 5
+    }
+  }
+]

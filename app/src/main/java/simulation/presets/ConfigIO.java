@@ -10,22 +10,16 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
-public class PresetLoader {
-    private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
+public class ConfigIO {
+    private static final Gson gson = new Gson();
 
-    public static List<SimulationPreset> loadPresets(InputStream is) {
-        return List.of(gson.fromJson(new InputStreamReader(is),SimulationPreset[].class));
-    }
+    public static List<SimulationPreset> loadPresets() {
+        try (InputStream is = ConfigIO.class.getResourceAsStream("/presets.json")) {
 
-    public static void saveConfig(SimulationConfig config, Path path) throws IOException {
-        try(Writer w = Files.newBufferedWriter(path)) {
-            gson.toJson(config, w);
-        }
-    }
+            return List.of( gson.fromJson(new InputStreamReader(is), SimulationPreset[].class));
 
-    public static SimulationConfig loadConfig(Path path) throws IOException {
-        try(Reader r = Files.newBufferedReader(path)) {
-            return gson.fromJson(r, SimulationConfig.class);
+        } catch (Exception e) {
+            throw new RuntimeException("Nie udało się wczytać presetów", e);
         }
     }
 }

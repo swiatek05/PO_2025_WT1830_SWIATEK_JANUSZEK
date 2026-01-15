@@ -9,8 +9,10 @@ import javafx.scene.control.*;
 import javafx.stage.Stage;
 import simulation.Simulation;
 import simulation.SimulationPresenter;
+import simulation.SimulationPreset;
 import simulation.SimulationVariant;
 import simulation.configs.*;
+import simulation.presets.ConfigIO;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -18,6 +20,7 @@ import java.util.Collections;
 import java.util.List;
 
 public class ConfigurationPresenter {
+    @FXML private ComboBox<SimulationPreset> presetComboBox;
     @FXML private Spinner<Integer> widthSpinner;
     @FXML private Spinner<Integer> heightSpinner;
     @FXML private ComboBox<SimulationVariant> variantComboBox;
@@ -41,6 +44,20 @@ public class ConfigurationPresenter {
     public void initialize() {
         variantComboBox.setItems(FXCollections.observableArrayList(SimulationVariant.values()));
         variantComboBox.getSelectionModel().selectFirst();
+
+        presetComboBox.setItems(
+                FXCollections.observableArrayList(ConfigIO.loadPresets())
+        );
+        presetComboBox.getSelectionModel().selectFirst();
+
+        presetComboBox.setOnAction(e -> {
+                    SimulationPreset preset = presetComboBox.getValue();
+                    if (preset != null) {
+                        System.out.println(preset.simulationConfig());
+                        applyPreset(preset.simulationConfig());
+                    }
+                });
+
         SpinnerValueFactory<Double> poisonFactory =
                 new SpinnerValueFactory.DoubleSpinnerValueFactory(0.0, 1.0, 0.1, 0.05);
         plantPoisonChangeSpinner.setValueFactory(poisonFactory);
@@ -49,6 +66,47 @@ public class ConfigurationPresenter {
                 new SpinnerValueFactory.IntegerSpinnerValueFactory(Integer.MIN_VALUE, 0, -10);
         plantPoisonDamageSpinner.setValueFactory(damageFactory);
     }
+
+    private void applyPreset(SimulationConfig c) {
+        widthSpinner.getValueFactory().setValue(c.mapConfig().MapWidth());
+        heightSpinner.getValueFactory().setValue(c.mapConfig().MapHeight());
+        variantComboBox.setValue(c.simulationVariant());
+
+        startPlantsCountSpinner.getValueFactory().setValue(c.startingPlantAmount());
+        dailyGrowthSpinner.getValueFactory().setValue(c.plantCountToGrowEveryday());
+
+        plantEnergySpinner.getValueFactory()
+                .setValue(c.plantConfig().plantConsumptionEnergy());
+        plantPoisonDamageSpinner.getValueFactory()
+                .setValue(c.plantConfig().plantPoisonConsumptionDamage());
+        plantPoisonChangeSpinner.getValueFactory()
+                .setValue(c.plantConfig().poisonPlantChance());
+
+        startAnimalsCountSpinner.getValueFactory()
+                .setValue(c.startingAnimalAmount());
+
+        startEnergySpinner.getValueFactory()
+                .setValue(c.animalConfig().startEnergy());
+        dayEndEnergyLossSpinner.getValueFactory()
+                .setValue(c.animalConfig().dayEndEnergyLoss());
+        ableToMateEnergyNeededSpinner.getValueFactory()
+                .setValue(c.animalConfig().ableToMateEnergyNeeded());
+        energyUsedToMateSpinner.getValueFactory()
+                .setValue(c.animalConfig().energyUsedToMate());
+
+        minMutationsSpinner.getValueFactory()
+                .setValue(c.genomeConfig().minMutateCount());
+        maxMutationsSpinner.getValueFactory()
+                .setValue(c.genomeConfig().maxMutateCount());
+
+        genome.setText(
+                c.genomeConfig().immunityGenes().stream()
+                        .map(String::valueOf)
+                        .reduce((a, b) -> a + "," + b)
+                        .orElse("")
+        );
+    }
+
 
     @FXML
     public void onStartSimulation() {
