@@ -12,7 +12,10 @@
         </padding>
 
         <Label text="Konfiguracja Symulacji" style="-fx-font-size: 24px; -fx-font-weight: bold;"/>
-        <ComboBox fx:id="presetComboBox"/>
+        <GridPane hgap="10" vgap="10">
+            <Label text="Preset: " GridPane.columnIndex="0" GridPane.rowIndex="0" />
+            <ComboBox fx:id="presetComboBox" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+        </GridPane>
 
         <TitledPane text="Ustawienia Mapy" collapsible="false">
             <GridPane hgap="10" vgap="10">

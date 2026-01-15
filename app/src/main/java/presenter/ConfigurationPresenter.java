@@ -46,6 +46,8 @@ public class ConfigurationPresenter {
     public void initialize() {
         variantComboBox.setItems(FXCollections.observableArrayList(SimulationVariant.values()));
         variantComboBox.getSelectionModel().selectFirst();
+        // this is kinda bad, but javafx sucks so I don't know how to do it better
+        setVisibilityOfPoison(variantComboBox.getValue());
 
         presetComboBox.setItems(
                 FXCollections.observableArrayList(ConfigIO.loadPresets())
@@ -55,9 +57,11 @@ public class ConfigurationPresenter {
         presetComboBox.setOnAction(e -> {
                     SimulationPreset preset = presetComboBox.getValue();
                     if (preset != null) {
+                        System.out.println(preset.simulationConfig());
                         applyPreset(preset.simulationConfig());
                     }
                 });
+
 
         SpinnerValueFactory<Double> poisonFactory =
                 new SpinnerValueFactory.DoubleSpinnerValueFactory(0.0, 1.0, 0.1, 0.05);
