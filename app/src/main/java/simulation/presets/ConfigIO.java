@@ -15,11 +15,25 @@ public class ConfigIO {
 
     public static List<SimulationPreset> loadPresets() {
         try (InputStream is = ConfigIO.class.getResourceAsStream("/presets.json")) {
-
             return List.of( gson.fromJson(new InputStreamReader(is), SimulationPreset[].class));
-
         } catch (Exception e) {
             throw new RuntimeException("Nie udało się wczytać presetów", e);
+        }
+    }
+
+    public static void savePresetToFile(Path path, SimulationConfig config) {
+        try (Writer w = Files.newBufferedWriter(path)) {
+            gson.toJson(config,w);
+        } catch (Exception e) {
+            throw new RuntimeException("Nie udało się zapisać presetu", e);
+        }
+    }
+
+    public static SimulationConfig readPresetFromFile(Path path) {
+        try (Reader r = Files.newBufferedReader(path)) {
+            return gson.fromJson(r,SimulationConfig.class);
+        } catch (Exception e) {
+            throw new RuntimeException("Nie udało się odczytać presetu z pliku");
         }
     }
 }

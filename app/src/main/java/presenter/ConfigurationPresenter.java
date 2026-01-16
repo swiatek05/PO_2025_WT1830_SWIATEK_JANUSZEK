@@ -7,6 +7,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import simulation.Simulation;
 import simulation.SimulationPresenter;
@@ -15,6 +16,7 @@ import simulation.SimulationVariant;
 import simulation.configs.*;
 import simulation.presets.ConfigIO;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
@@ -177,62 +179,19 @@ public class ConfigurationPresenter {
         }
 
         List<Integer> immunityGenesList = Collections.emptyList();
-        Integer genesNumber = 1;
-
-        switch (variantComboBox.getValue()) {
-            case STANDARD -> {
-                genesNumber = genomeNumber.getValue();
-            }
-            case POISONOUS_PLANTS -> {
-                try {
-                    String rawInput = genome.getText().trim();
-                    immunityGenesList = Arrays.stream(rawInput.split(","))
-                            .map(String::trim)
-                            .filter(s -> !s.isEmpty())
-                            .map(Integer::parseInt)
-                            .toList();
-                } catch (NumberFormatException e) {
-                    showError("Geny muszą być liczbami rozdzielonymi przecinkami!");
-                    return;
-                }
-                genesNumber = immunityGenesList.size();
-            }
+        try {
+            String rawInput = genome.getText().trim();
+            immunityGenesList = Arrays.stream(rawInput.split(","))
+                    .map(String::trim)
+                    .filter(s -> !s.isEmpty())
+                    .map(Integer::parseInt)
+                    .toList();
+        } catch (NumberFormatException e) {
+            showError("Geny muszą być liczbami rozdzielonymi przecinkami!");
         }
 
-        AnimalConfig animalConfig = new AnimalConfig(
-                startEnergySpinner.getValue(),
-                dayEndEnergyLossSpinner.getValue(),
-                ableToMateEnergyNeededSpinner.getValue(),
-                energyUsedToMateSpinner.getValue()
-        );
-        GenomeConfig genomeConfig = new GenomeConfig(
-                genesNumber,
-                minMutationsSpinner.getValue(),
-                maxMutationsSpinner.getValue(),
-                immunityGenesList
-        );
-        PlantConfig plantConfig = new PlantConfig(
-                plantEnergySpinner.getValue(),
-                plantPoisonDamageSpinner.getValue(),
-                plantPoisonChangeSpinner.getValue()
-        );
-        MapConfig mapConfig = new MapConfig(
-                widthSpinner.getValue(),
-                heightSpinner.getValue(),
-                variantComboBox.getValue()
-        );
-        SimulationConfig config = new SimulationConfig(
-                animalConfig,
-                genomeConfig,
-                plantConfig,
-                mapConfig,
-                variantComboBox.getValue(),
-                startPlantsCountSpinner.getValue(),
-                startAnimalsCountSpinner.getValue(),
-                dailyGrowthSpinner.getValue()
-        );
-
-       openSimulation(config);
+        SimulationConfig config = readFromUI();
+        openSimulation(config);
 
     }
 
@@ -263,6 +222,97 @@ public class ConfigurationPresenter {
         alert.showAndWait();
     }
 
-    public void onSaveConfig() {}
-    public void onLoadConfig() {}
+    private SimulationConfig readFromUI() {
+        List<Integer> immunityGenesList = Collections.emptyList();
+        Integer genesNumber = 1;
+
+        switch (variantComboBox.getValue()) {
+            case STANDARD -> {
+                genesNumber = genomeNumber.getValue();
+            }
+            case POISONOUS_PLANTS -> {
+                String rawInput = genome.getText().trim();
+                immunityGenesList = Arrays.stream(rawInput.split(","))
+                        .map(String::trim)
+                        .filter(s -> !s.isEmpty())
+                        .map(Integer::parseInt)
+                        .toList();
+                genesNumber = immunityGenesList.size();
+            }
+        }
+
+        AnimalConfig animalConfig = new AnimalConfig(
+                startEnergySpinner.getValue(),
+                dayEndEnergyLossSpinner.getValue(),
+                ableToMateEnergyNeededSpinner.getValue(),
+                energyUsedToMateSpinner.getValue()
+        );
+        GenomeConfig genomeConfig = new GenomeConfig(
+                genesNumber,
+                minMutationsSpinner.getValue(),
+                maxMutationsSpinner.getValue(),
+                immunityGenesList
+        );
+        PlantConfig plantConfig = new PlantConfig(
+                plantEnergySpinner.getValue(),
+                plantPoisonDamageSpinner.getValue(),
+                plantPoisonChangeSpinner.getValue()
+        );
+        MapConfig mapConfig = new MapConfig(
+                widthSpinner.getValue(),
+                heightSpinner.getValue(),
+                variantComboBox.getValue()
+        );
+        return new SimulationConfig(
+                animalConfig,
+                genomeConfig,
+                plantConfig,
+                mapConfig,
+                variantComboBox.getValue(),
+                startPlantsCountSpinner.getValue(),
+                startAnimalsCountSpinner.getValue(),
+                dailyGrowthSpinner.getValue()
+        );
+    }
+
+    private File ensureJsonExtension(File file) {
+        if (file.getName().toLowerCase().endsWith(".json")) {
+            return file;
+        }
+        return new File(file.getParentFile(), file.getName() + ".json");
+    }
+
+    public void onSaveConfig() {
+        SimulationConfig config = readFromUI();
+
+        FileChooser fc = new FileChooser();
+        fc.getExtensionFilters().add(new FileChooser.ExtensionFilter("JSON Files",".json"));
+
+        File file = fc.showSaveDialog(null);
+        if (file == null) return;
+
+        file = ensureJsonExtension(file);
+
+        try {
+            ConfigIO.savePresetToFile(file.toPath(),config);
+        } catch (Exception e) {
+            showError("Nie udało się zapisać konfiguracji "+e);
+        }
+    }
+    public void onLoadConfig() {
+        FileChooser fc = new FileChooser();
+        fc.getExtensionFilters().add(new FileChooser.ExtensionFilter("JSON Files",".json"));
+
+        File file = fc.showOpenDialog(null);
+        if (file == null) return;
+
+        presetComboBox.getSelectionModel().clearSelection();
+
+        try {
+            SimulationConfig config = ConfigIO.readPresetFromFile(file.toPath());
+            applyPreset(config);
+        } catch (Exception e) {
+            showError("Nie udało się wczytać konfiguracji "+e);
+        }
+    }
 }
