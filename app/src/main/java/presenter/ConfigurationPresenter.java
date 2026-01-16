@@ -63,7 +63,6 @@ public class ConfigurationPresenter {
         presetComboBox.setOnAction(e -> {
                     SimulationPreset preset = presetComboBox.getValue();
                     if (preset != null) {
-                        System.out.println(preset.simulationConfig());
                         applyPreset(preset.simulationConfig());
                     }
                 });
