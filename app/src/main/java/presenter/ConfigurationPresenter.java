@@ -1,6 +1,7 @@
 package presenter;
 
 import javafx.collections.FXCollections;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -39,6 +40,9 @@ public class ConfigurationPresenter {
     @FXML private Spinner<Integer> minMutationsSpinner;
     @FXML private Spinner<Integer> maxMutationsSpinner;
     @FXML private TextField genome;
+    @FXML private Label genomeLabel;
+    @FXML private Spinner<Integer> genomeNumber;
+    @FXML private Label genomeNumberLabel;
 
     private int simulationId=0;
 
@@ -130,6 +134,16 @@ public class ConfigurationPresenter {
                 plantPoisonDamageSpinner.setManaged(false);
                 plantPoisonDamageSpinnerLabel.setVisible(false);
                 plantPoisonDamageSpinnerLabel.setManaged(false);
+
+                genome.setVisible(false);
+                genome.setManaged(false);
+                genomeLabel.setVisible(false);
+                genomeLabel.setManaged(false);
+
+                genomeNumber.setVisible(true);
+                genomeNumber.setManaged(true);
+                genomeNumberLabel.setVisible(true);
+                genomeNumberLabel.setManaged(true);
             }
             case POISONOUS_PLANTS -> {
                 plantPoisonChangeSpinner.setVisible(true);
@@ -141,6 +155,16 @@ public class ConfigurationPresenter {
                 plantPoisonDamageSpinner.setManaged(true);
                 plantPoisonDamageSpinnerLabel.setVisible(true);
                 plantPoisonDamageSpinnerLabel.setManaged(true);
+
+                genome.setVisible(true);
+                genome.setManaged(true);
+                genomeLabel.setVisible(true);
+                genomeLabel.setManaged(true);
+
+                genomeNumber.setVisible(false);
+                genomeNumber.setManaged(false);
+                genomeNumberLabel.setVisible(false);
+                genomeNumberLabel.setManaged(false);
             }
         }
     }
@@ -151,21 +175,28 @@ public class ConfigurationPresenter {
             showError("Minimalna liczba mutacji nie może przekraczać maksymalnej!!!");
             return;
         }
-        List<Integer> immunityGenesList;
-        try {
-            String rawInput = genome.getText().trim();
-            if (rawInput.isEmpty()) {
-                immunityGenesList =Collections.emptyList();
-            } else {
-                immunityGenesList = Arrays.stream(rawInput.split(","))
-                        .map(String::trim)
-                        .filter(s -> !s.isEmpty())
-                        .map(Integer::parseInt)
-                        .toList();
+
+        List<Integer> immunityGenesList = Collections.emptyList();
+        Integer genesNumber = 1;
+
+        switch (variantComboBox.getValue()) {
+            case STANDARD -> {
+                genesNumber = genomeNumber.getValue();
             }
-        } catch (NumberFormatException e) {
-            showError("Geny muszą być liczbami rozdzielonymi przecinkami!");
-            return;
+            case POISONOUS_PLANTS -> {
+                try {
+                    String rawInput = genome.getText().trim();
+                    immunityGenesList = Arrays.stream(rawInput.split(","))
+                            .map(String::trim)
+                            .filter(s -> !s.isEmpty())
+                            .map(Integer::parseInt)
+                            .toList();
+                } catch (NumberFormatException e) {
+                    showError("Geny muszą być liczbami rozdzielonymi przecinkami!");
+                    return;
+                }
+                genesNumber = immunityGenesList.size();
+            }
         }
 
         AnimalConfig animalConfig = new AnimalConfig(
@@ -175,7 +206,7 @@ public class ConfigurationPresenter {
                 energyUsedToMateSpinner.getValue()
         );
         GenomeConfig genomeConfig = new GenomeConfig(
-                immunityGenesList.size(),
+                genesNumber,
                 minMutationsSpinner.getValue(),
                 maxMutationsSpinner.getValue(),
                 immunityGenesList
@@ -231,4 +262,7 @@ public class ConfigurationPresenter {
         alert.setContentText(message);
         alert.showAndWait();
     }
+
+    public void onSaveConfig() {}
+    public void onLoadConfig() {}
 }

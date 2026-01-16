@@ -88,6 +88,10 @@ public class Genome {
         List<Integer> immunityGenes = genomeConfig.immunityGenes();
         int matching = 0;
 
+        if (immunityGenes.isEmpty()) {
+            return 0;
+        }
+
         for(int i = 0; i < genomeConfig.genomeLength(); i++) {
             if (Objects.equals(immunityGenes.get(i), genes.get(i))) {
                 matching += 1;

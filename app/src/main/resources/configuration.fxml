@@ -4,6 +4,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.geometry.Insets?>
 
+<?import javafx.scene.chart.BubbleChart?>
 <ScrollPane fitToWidth="true" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
             fx:controller="presenter.ConfigurationPresenter">
     <VBox spacing="10">
@@ -15,6 +16,8 @@
         <GridPane hgap="10" vgap="10">
             <Label text="Preset: " GridPane.columnIndex="0" GridPane.rowIndex="0" />
             <ComboBox fx:id="presetComboBox" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+            <Button text="Zapisz konfigurację" onAction="#onSaveConfig" GridPane.rowIndex="0" GridPane.columnIndex="4"/>
+            <Button text="Wczytaj konfigurację" onAction="#onLoadConfig" GridPane.rowIndex="0" GridPane.columnIndex="5"/>
         </GridPane>
 
         <TitledPane text="Ustawienia Mapy" collapsible="false">
@@ -76,8 +79,11 @@
                 <Label text="Max mutacji:" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
                 <Spinner fx:id="maxMutationsSpinner" initialValue="2" min="0" max="20" editable="true" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
 
-                <Label text="Geny odporności (np. 1,2,5):" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+                <Label fx:id="genomeLabel" text="Geny odporności (np. 1,2,5):" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
                 <TextField fx:id="genome" promptText="Wpisz liczby po przecinku" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+
+                <Label fx:id="genomeNumberLabel" text="Liczba genów: " GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+                <Spinner fx:id="genomeNumber" initialValue="5" min="1" max="20" editable="true" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
             </GridPane>
         </TitledPane>
 
