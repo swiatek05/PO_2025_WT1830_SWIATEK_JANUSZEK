@@ -1,0 +1,126 @@
+[
+  {
+    "name": "Domyślna symulacja",
+    "simulationConfig": {
+      "animalConfig": {
+        "startEnergy": 20,
+        "dayEndEnergyLoss": 1,
+        "ableToMateEnergyNeeded": 15,
+        "energyUsedToMate": 10
+      },
+      "genomeConfig": {
+        "genomeLength": 5,
+        "minMutateCount": 0,
+        "maxMutateCount": 2,
+        "immunityGenes": [1,2,3,4,5]
+      },
+      "plantConfig": {
+        "plantConsumptionEnergy": 10,
+        "plantPoisonConsumptionDamage": -10,
+        "poisonPlantChance": 0.1
+      },
+      "mapConfig": {
+        "MapWidth": 50,
+        "MapHeight": 50,
+        "simulationVariant": "STANDARD"
+      },
+      "simulationVariant": "STANDARD",
+      "startingPlantAmount": 50,
+      "startingAnimalAmount": 20,
+      "plantCountToGrowEveryday": 5
+    }
+  },
+  {
+    "name": "Trujące rośliny",
+    "simulationConfig": {
+      "animalConfig": {
+        "startEnergy": 20,
+        "dayEndEnergyLoss": 1,
+        "ableToMateEnergyNeeded": 15,
+        "energyUsedToMate": 10
+      },
+      "genomeConfig": {
+        "genomeLength": 5,
+        "minMutateCount": 0,
+        "maxMutateCount": 2,
+        "immunityGenes": [1,2,3,4,5]
+      },
+      "plantConfig": {
+        "plantConsumptionEnergy": 10,
+        "plantPoisonConsumptionDamage": -10,
+        "poisonPlantChance": 0.1
+      },
+      "mapConfig": {
+        "MapWidth": 50,
+        "MapHeight": 50,
+        "simulationVariant": "POISONOUS_PLANTS"
+      },
+      "simulationVariant": "POISONOUS_PLANTS",
+      "startingPlantAmount": 50,
+      "startingAnimalAmount": 20,
+      "plantCountToGrowEveryday": 5
+    }
+  },
+  {
+    "name": "Horyzontalny świat",
+    "simulationConfig": {
+      "animalConfig": {
+        "startEnergy": 30,
+        "dayEndEnergyLoss": 1,
+        "ableToMateEnergyNeeded": 10,
+        "energyUsedToMate": 10
+      },
+      "genomeConfig": {
+        "genomeLength": 6,
+        "minMutateCount": 0,
+        "maxMutateCount": 2,
+        "immunityGenes": [1,2,3,4,5]
+      },
+      "plantConfig": {
+        "plantConsumptionEnergy": 10,
+        "plantPoisonConsumptionDamage": -20,
+        "poisonPlantChance": 0.2
+      },
+      "mapConfig": {
+        "MapWidth": 100,
+        "MapHeight": 30,
+        "simulationVariant": "POISONOUS_PLANTS"
+      },
+      "simulationVariant": "POISONOUS_PLANTS",
+      "startingPlantAmount": 100,
+      "startingAnimalAmount": 40,
+      "plantCountToGrowEveryday": 15
+    }
+  },
+  {
+    "name": "Wertykalny świat",
+    "simulationConfig": {
+      "animalConfig": {
+        "startEnergy": 40,
+        "dayEndEnergyLoss": 1,
+        "ableToMateEnergyNeeded": 10,
+        "energyUsedToMate": 10
+      },
+      "genomeConfig": {
+        "genomeLength": 5,
+        "minMutateCount": 1,
+        "maxMutateCount": 3,
+        "immunityGenes": [1,2,3,4,5]
+      },
+      "plantConfig": {
+        "plantConsumptionEnergy": 20,
+        "plantPoisonConsumptionDamage": -5,
+        "poisonPlantChance": 0.3
+      },
+      "mapConfig": {
+        "MapWidth": 30,
+        "MapHeight": 100,
+        "simulationVariant": "POISONOUS_PLANTS"
+      },
+      "simulationVariant": "POISONOUS_PLANTS",
+      "startingPlantAmount": 200,
+      "startingAnimalAmount": 40,
+      "plantCountToGrowEveryday": 25
+    }
+  }
+]
