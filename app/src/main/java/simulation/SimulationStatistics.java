@@ -72,6 +72,7 @@ public class SimulationStatistics {
         }
         return (double) sumAge/deadAnimals.size();
     }
+
     public int getNumberOfAnimals() {
         return numberOfAnimals;
     }

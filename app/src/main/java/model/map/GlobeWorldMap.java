@@ -431,6 +431,23 @@ public class GlobeWorldMap implements WorldMap {
         }
         return children;
     }
+    public List<Integer> findMinMaxEnergy(){
+        int minEnergy=Integer.MAX_VALUE;
+        int maxEnergy=Integer.MIN_VALUE;
+        for(List<Animal> animalList : animals.values()){
+            for(Animal animal: animalList){
+                if(minEnergy>animal.getEnergy()){
+                    minEnergy = animal.getEnergy();
+                }
+                if(maxEnergy<animal.getEnergy()){
+                    maxEnergy = animal.getEnergy();
+                }
+            }
+        }
+        return List.of(minEnergy,maxEnergy);
+
+
+    }
 
     public int getPlantsCount() {
         return plants.size();

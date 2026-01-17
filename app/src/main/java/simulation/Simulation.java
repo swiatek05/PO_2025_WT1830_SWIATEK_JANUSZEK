@@ -61,8 +61,11 @@ public class Simulation implements Runnable {
             //map.mapChanged("Dzień: "+currentDay);
 
             statistics.update(aliveAnimals,map.getPlantsCount(),map.getFreeFields(),deadAnimals);
+
+            List<Integer> MinMaxEnergy=map.findMinMaxEnergy();
+
             if (presenter != null) {
-                presenter.mapChanged(currentDay);
+                presenter.mapChanged(currentDay,MinMaxEnergy.get(0),MinMaxEnergy.get(1));
             }
             currentDay++;
             if(presenter != null) {
