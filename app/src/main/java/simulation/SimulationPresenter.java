@@ -8,6 +8,7 @@ import javafx.fxml.FXML;
 import javafx.geometry.HPos;
 import javafx.geometry.VPos;
 import javafx.scene.chart.LineChart;
+import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
@@ -77,6 +78,8 @@ public class SimulationPresenter {
     private ComboBox<String> statsComboBox;
     @FXML
     private LineChart<Number, Number> statsChart;
+    @FXML
+    public NumberAxis xAxis;
 
     private Animal trackedAnimal=null;
 
@@ -364,7 +367,11 @@ public class SimulationPresenter {
         isPaused=!isPaused;
     }
 
+    @FXML
     public void onStatSelectionChanged() {
         chartDataSeries.getData().clear();
+
+        xAxis.setLowerBound(currentDayDisplay);
+        xAxis.setAutoRanging(true);
     }
 }

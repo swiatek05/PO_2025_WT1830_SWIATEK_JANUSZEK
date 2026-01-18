@@ -132,7 +132,7 @@
 
                 <LineChart fx:id="statsChart" animated="false" createSymbols="false" legendVisible="false" VBox.vgrow="ALWAYS">
                     <xAxis>
-                        <NumberAxis fx:id="xAxis" label="Dzień" side="BOTTOM" />
+                        <NumberAxis fx:id="xAxis" label="Dzień" side="BOTTOM" forceZeroInRange="false"/>
                     </xAxis>
                     <yAxis>
                         <NumberAxis fx:id="yAxis" side="LEFT" />
