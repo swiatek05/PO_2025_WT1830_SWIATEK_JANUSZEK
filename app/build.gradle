@@ -24,6 +24,10 @@ dependencies {
 }
 
 dependencies {
+    implementation 'com.opencsv:opencsv:5.8'
+}
+
+dependencies {
     // Use JUnit Jupiter for testing.
     testImplementation libs.junit.jupiter
 

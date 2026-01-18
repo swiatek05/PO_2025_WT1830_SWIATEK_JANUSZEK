@@ -5,6 +5,9 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.chart.LineChart?>
+<?import javafx.scene.chart.NumberAxis?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
@@ -14,8 +17,7 @@
 <?import javafx.scene.shape.Circle?>
 <?import javafx.scene.shape.Rectangle?>
 
-<?import javafx.scene.control.ScrollPane?>
-<BorderPane prefHeight="790.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/21"
+<BorderPane prefHeight="790.0" prefWidth="1350.0" xmlns="http://javafx.com/javafx/21"
             xmlns:fx="http://javafx.com/fxml/1" fx:controller="simulation.SimulationPresenter">
     <center>
         <ScrollPane fitToHeight="true" fitToWidth="true" style="-fx-background: #e0e0e0;">
@@ -26,115 +28,118 @@
         </ScrollPane>
     </center>
 
-<right>
-<VBox alignment="TOP_CENTER" prefWidth="290.0" spacing="10.0"
-      style="-fx-background-color: #f4f4f4; -fx-border-color: #cccccc; -fx-border-width: 0 0 0 1;">
-    <padding>
-        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0"/>
-    </padding>
+    <right>
+        <HBox spacing="0" style="-fx-background-color: #f4f4f4; -fx-border-color: #cccccc; -fx-border-width: 0 0 0 1;">
 
-    <Label style="-fx-font-size: 18px; -fx-font-weight: bold;" text="Statystyki Symulacji"/>
+            <VBox alignment="TOP_CENTER" prefWidth="290.0" spacing="10.0">
+                <padding>
+                    <Insets bottom="20.0" left="20.0" right="20.0" top="20.0"/>
+                </padding>
 
-    <Separator prefWidth="200.0"/>
+                <Label style="-fx-font-size: 18px; -fx-font-weight: bold;" text="Statystyki Symulacji"/>
+                <Separator prefWidth="200.0"/>
 
-    <GridPane hgap="10.0" vgap="8.0">
-        <columnConstraints>
-            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0"/>
-            <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" minWidth="10.0"/>
-        </columnConstraints>
+                <GridPane hgap="10.0" vgap="8.0">
+                    <columnConstraints>
+                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0"/>
+                        <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" minWidth="10.0"/>
+                    </columnConstraints>
+                    <Label text="Dzień:" GridPane.rowIndex="0"/>
+                    <Label fx:id="day" style="-fx-font-weight: bold;" text="0" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+                    <Label text="Liczba zwierząt:" GridPane.rowIndex="1"/>
+                    <Label fx:id="numberOfAnimals" text="0" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+                    <Label text="Liczba roślin:" GridPane.rowIndex="2"/>
+                    <Label fx:id="numberOfPlants" text="0" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+                    <Label text="Wolne pola:" GridPane.rowIndex="3"/>
+                    <Label fx:id="freeFields" text="0" GridPane.columnIndex="1" GridPane.rowIndex="3"/>
+                    <Label text="Najpopularniejszy gen:" GridPane.rowIndex="4"/>
+                    <Label fx:id="mostPopularGenom" text="-" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="4"/>
+                    <Label text="Śr. energia:" GridPane.rowIndex="5"/>
+                    <Label fx:id="averageEnergy" text="0.00" GridPane.columnIndex="1" GridPane.rowIndex="5"/>
+                    <Label text="Śr. długość życia:" GridPane.rowIndex="6"/>
+                    <Label fx:id="averageAgeForDead" text="0.00" GridPane.columnIndex="1" GridPane.rowIndex="6"/>
+                    <Label text="Śr. liczba dzieci:" GridPane.rowIndex="7"/>
+                    <Label fx:id="averageChildrenCount" text="0.00" GridPane.columnIndex="1" GridPane.rowIndex="7"/>
+                </GridPane>
 
-        <Label text="Dzień:" GridPane.rowIndex="0"/>
-        <Label fx:id="day" style="-fx-font-weight: bold;" text="0" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+                <Separator prefWidth="200.0"/>
+                <Button fx:id="pauseButton" maxWidth="1.7976931348623157E308" onAction="#onPauseButton" prefHeight="40.0"
+                        style="-fx-background-color: #d32f2f; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand;"
+                        text="PAUZA"/>
+                <Separator prefWidth="200.0"/>
+                <Label style="-fx-font-weight: bold; -fx-font-size: 16px;" text="Statystyki wybranego zwierzaka" wrapText="True"/>
 
-        <Label text="Liczba zwierząt:" GridPane.rowIndex="1"/>
-        <Label fx:id="numberOfAnimals" text="0" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+                <GridPane hgap="10.0" vgap="8.0">
+                    <columnConstraints>
+                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0"/>
+                        <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" minWidth="10.0"/>
+                    </columnConstraints>
+                    <Label text="Genom:" GridPane.rowIndex="0"/>
+                    <Label fx:id="trackedGenome" text="-" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+                    <Label text="Aktywny gen:" GridPane.rowIndex="1"/>
+                    <Label fx:id="trackedActiveGene" text="-" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+                    <Label text="Energia:" GridPane.rowIndex="2"/>
+                    <Label fx:id="trackedEnergy" text="-" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+                    <Label text="Zjedzone rośliny:" GridPane.rowIndex="3"/>
+                    <Label fx:id="trackedPlantsEaten" text="-" GridPane.columnIndex="1" GridPane.rowIndex="3"/>
+                    <Label text="Liczba dzieci:" GridPane.rowIndex="4"/>
+                    <Label fx:id="trackedChildrenCount" text="0" GridPane.columnIndex="1" GridPane.rowIndex="4"/>
+                    <Label text="Liczba potomków:" GridPane.rowIndex="5"/>
+                    <Label fx:id="trackedDescendantsCount" text="0" GridPane.columnIndex="1" GridPane.rowIndex="5"/>
+                    <Label text="Wiek:" GridPane.rowIndex="6"/>
+                    <Label fx:id="trackedAge" text="0" GridPane.columnIndex="1" GridPane.rowIndex="6"/>
+                    <Label text="Status:" GridPane.rowIndex="7"/>
+                    <Label fx:id="trackedStatus" text="brak" style="-fx-font-weight: bold;" GridPane.columnIndex="1" GridPane.rowIndex="7"/>
+                </GridPane>
 
-        <Label text="Liczba roślin:" GridPane.rowIndex="2"/>
-        <Label fx:id="numberOfPlants" text="0" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+                <Separator prefWidth="200.0"/>
+                <Label style="-fx-font-weight: bold;" text="Legenda:"/>
+                <VBox spacing="5.0">
+                    <HBox alignment="CENTER_LEFT" spacing="10.0">
+                        <Circle fill="BLUE" radius="6.0"/>
+                        <Label text="Zwierzę (im jaśniejsze = mniej energii)" wrapText="true"/>
+                    </HBox>
+                    <HBox alignment="CENTER_LEFT" spacing="10.0">
+                        <Circle fill="TRANSPARENT" radius="6.0" stroke="BLACK" strokeWidth="2"/>
+                        <Label text="Dominator (Energia > 3x startowa)" wrapText="true"/>
+                    </HBox>
+                    <HBox alignment="CENTER_LEFT" spacing="10.0">
+                        <Rectangle arcHeight="5.0" arcWidth="5.0" fill="LIMEGREEN" height="12.0" width="12.0"/>
+                        <Label text="Roślina pożywna"/>
+                    </HBox>
+                    <HBox alignment="CENTER_LEFT" spacing="10.0">
+                        <Rectangle arcHeight="5.0" arcWidth="5.0" fill="RED" height="12.0" width="12.0"/>
+                        <Label text="Roślina trująca" wrapText="True" maxWidth="220.0"/>
+                    </HBox>
+                    <HBox alignment="CENTER_LEFT" spacing="10.0">
+                        <Rectangle arcHeight="5.0" arcWidth="5.0" fill="BEIGE" height="12.0" width="12.0"/>
+                        <Label text="Pusta ziemia"/>
+                    </HBox>
+                </VBox>
+            </VBox>
+            <Separator orientation="VERTICAL"/>
 
-        <Label text="Wolne pola:" GridPane.rowIndex="3"/>
-        <Label fx:id="freeFields" text="0" GridPane.columnIndex="1" GridPane.rowIndex="3"/>
+            <VBox alignment="TOP_CENTER" prefWidth="400.0" spacing="10.0">
+                <padding>
+                    <Insets bottom="20.0" left="15.0" right="20.0" top="20.0"/>
+                </padding>
+                <Label style="-fx-font-size: 18px; -fx-font-weight: bold;" text="Wykres Statystyk"/>
 
-        <Label text="Najpopularniejszy gen:" GridPane.rowIndex="4"/>
-        <Label fx:id="mostPopularGenom" text="-" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="4"/>
+                <HBox spacing="10" alignment="CENTER">
+                    <Label text="Statystyka:"/>
+                    <ComboBox fx:id="statsComboBox" onAction="#onStatSelectionChanged" prefWidth="180.0"/>
+                </HBox>
 
-        <Label text="Śr. energia:" GridPane.rowIndex="5"/>
-        <Label fx:id="averageEnergy" text="0.00" GridPane.columnIndex="1" GridPane.rowIndex="5"/>
+                <LineChart fx:id="statsChart" animated="false" createSymbols="false" legendVisible="false" VBox.vgrow="ALWAYS">
+                    <xAxis>
+                        <NumberAxis fx:id="xAxis" label="Dzień" side="BOTTOM" forceZeroInRange="false"/>
+                    </xAxis>
+                    <yAxis>
+                        <NumberAxis fx:id="yAxis" side="LEFT" />
+                    </yAxis>
+                </LineChart>
+            </VBox>
 
-        <Label text="Śr. długość życia:" GridPane.rowIndex="6"/>
-        <Label fx:id="averageAgeForDead" text="0.00" GridPane.columnIndex="1" GridPane.rowIndex="6"/>
-
-        <Label text="Śr. liczba dzieci:" GridPane.rowIndex="7"/>
-        <Label fx:id="averageChildrenCount" text="0.00" GridPane.columnIndex="1" GridPane.rowIndex="7"/>
-    </GridPane>
-
-    <Separator prefWidth="200.0"/>
-
-    <Button fx:id="pauseButton" maxWidth="1.7976931348623157E308" onAction="#onPauseButton" prefHeight="40.0"
-            style="-fx-background-color: #d32f2f; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand;"
-            text="PAUZA"/>
-    <Separator prefWidth="200.0"/>
-    <Label style="-fx-font-weight: bold; -fx-font-size: 16px;" text="Statystyki wybranego zwierzaka" wrapText="True"/>
-
-    <GridPane hgap="10.0" vgap="8.0">
-        <columnConstraints>
-            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0"/>
-            <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" minWidth="10.0"/>
-        </columnConstraints>
-
-        <Label text="Genom:" GridPane.rowIndex="0"/>
-        <Label fx:id="trackedGenome" text="-" wrapText="true" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
-
-        <Label text="Aktywny gen:" GridPane.rowIndex="1"/>
-        <Label fx:id="trackedActiveGene" text="-" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
-
-        <Label text="Energia:" GridPane.rowIndex="2"/>
-        <Label fx:id="trackedEnergy" text="-" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
-
-        <Label text="Zjedzone rośliny:" GridPane.rowIndex="3"/>
-        <Label fx:id="trackedPlantsEaten" text="-" GridPane.columnIndex="1" GridPane.rowIndex="3"/>
-
-        <Label text="Liczba dzieci:" GridPane.rowIndex="4"/>
-        <Label fx:id="trackedChildrenCount" text="0" GridPane.columnIndex="1" GridPane.rowIndex="4"/>
-
-        <Label text="Liczba potomków:" GridPane.rowIndex="5"/>
-        <Label fx:id="trackedDescendantsCount" text="0" GridPane.columnIndex="1" GridPane.rowIndex="5"/>
-
-        <Label text="Wiek:" GridPane.rowIndex="6"/>
-        <Label fx:id="trackedAge" text="0" GridPane.columnIndex="1" GridPane.rowIndex="6"/>
-
-        <Label text="Status:" GridPane.rowIndex="7"/>
-        <Label fx:id="trackedStatus" text="brak" style="-fx-font-weight: bold;" GridPane.columnIndex="1" GridPane.rowIndex="7"/>
-    </GridPane>
-
-    <Separator prefWidth="200.0"/>
-
-    <Label style="-fx-font-weight: bold;" text="Legenda:"/>
-
-    <VBox spacing="5.0">
-        <HBox alignment="CENTER_LEFT" spacing="10.0">
-            <Circle fill="BLUE" radius="6.0"/>
-            <Label text="Zwierzę (im jaśniejsze = mniej energii)" wrapText="true"/>
         </HBox>
-        <HBox alignment="CENTER_LEFT" spacing="10.0">
-            <Circle fill="TRANSPARENT" radius="6.0" stroke="BLACK" strokeWidth="2"/>
-            <Label text="Dominator (Energia > 3x startowa)" wrapText="true"/>
-        </HBox>
-        <HBox alignment="CENTER_LEFT" spacing="10.0">
-            <Rectangle arcHeight="5.0" arcWidth="5.0" fill="LIMEGREEN" height="12.0" width="12.0"/>
-            <Label text="Roślina pożywna"/>
-        </HBox>
-        <HBox alignment="CENTER_LEFT" spacing="10.0">
-            <Rectangle arcHeight="5.0" arcWidth="5.0" fill="RED" height="12.0" width="12.0"/>
-            <Label text="Roślina trująca (bardziej czerwona = bardziej trująca)" wrapText="True" maxWidth="220.0"/>
-        </HBox>
-        <HBox alignment="CENTER_LEFT" spacing="10.0">
-            <Rectangle arcHeight="5.0" arcWidth="5.0" fill="BEIGE" height="12.0" width="12.0"/>
-            <Label text="Pusta ziemia"/>
-        </HBox>
-    </VBox>
-
-</VBox>
-
-</right>
-        </BorderPane>
+    </right>
+</BorderPane>
