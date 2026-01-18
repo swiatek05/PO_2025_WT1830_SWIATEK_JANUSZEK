@@ -9,9 +9,10 @@ import org.jspecify.annotations.NonNull;
 import simulation.configs.AnimalConfig;
 import simulation.configs.GenomeConfig;
 
-import java.util.*;
+import java.util.Comparator;
+import java.util.Objects;
 
-public class Animal implements WorldElement, Comparable<Animal> {
+public class Animal implements WorldElement, Comparable<Animal>{
     private MapDirection orientation;
     private Vector2d position;
     private int energy;
@@ -22,12 +23,11 @@ public class Animal implements WorldElement, Comparable<Animal> {
     private int age = 0;
     private final int birthDay;
     private int childCount = 0;
-    private int countEatenPlants = 0;
-    private final Set<Animal> descendants= new HashSet<>();
-    private Animal parent1=null;
-    private Animal parent2=null;
+
+
+
     // initial animals created at the start of simulation
-    public Animal(Vector2d position, int currentDay, AnimalConfig animalConfig, GenomeConfig genomeConfig) {
+    public Animal(Vector2d position,int currentDay,AnimalConfig animalConfig, GenomeConfig genomeConfig) {
         this.position = position;
         this.animalConfig = animalConfig;
         this.genomeConfig = genomeConfig;
@@ -35,12 +35,10 @@ public class Animal implements WorldElement, Comparable<Animal> {
         this.genome = new Genome(genomeConfig);
         this.orientation = MapDirection.getRandomDirection();
         this.birthDay = currentDay;
-
-
     }
 
     // create animal by mating
-    public Animal(Vector2d position, Genome genome, int currentDay, AnimalConfig animalConfig, GenomeConfig genomeConfig,Animal p1,Animal p2) {
+    public Animal(Vector2d position, Genome genome,int currentDay,AnimalConfig animalConfig, GenomeConfig genomeConfig) {
         this.position = position;
         this.animalConfig = animalConfig;
         this.genomeConfig = genomeConfig;
@@ -48,8 +46,6 @@ public class Animal implements WorldElement, Comparable<Animal> {
         this.genome = genome;
         this.orientation = MapDirection.getRandomDirection();
         this.birthDay = currentDay;
-        this.parent1 = p1;
-        this.parent2 = p2;
     }
 
     // only used for testing
@@ -64,36 +60,27 @@ public class Animal implements WorldElement, Comparable<Animal> {
         this.childCount = childCount;
         this.age = age;
     }
-    public void addDescendant(Animal descendant) {
-        if (descendants.add(descendant)) {
-            if (parent1!=null){
-                parent1.addDescendant(descendant);
-            }
-            if (parent2!=null){
-                parent2.addDescendant(descendant);
-            }
-        }
+
+    public int getAge() {
+        return this.age;
     }
+    public int getAgeForDead() { return dayOfDeath; }
 
     // mating behaviour
-    public Animal mate(Animal partner, int currentDay) {
-        Genome childGenome = new Genome(this, partner, this.genomeConfig);
+    public Animal mate(Animal partner,int currentDay) {
+        Genome childGenome = new Genome(this, partner,this.genomeConfig);
         this.decreaseEnergyMating();
         partner.decreaseEnergyMating();
         this.childCount++;
         partner.childCount++;
 
-        Animal child=new Animal(this.position,childGenome,currentDay,animalConfig,genomeConfig,this,partner);
-        this.addDescendant(child);
-        partner.addDescendant(child);
-
-        return child;
+        return new Animal(this.position,childGenome,currentDay,animalConfig,genomeConfig);
     }
 
     public void move(GlobeWorldMap map) {
-        Vector2d unitVector = this.orientation.toUnitVector();
+        Vector2d unitVector= this.orientation.toUnitVector();
         Vector2d wantedPosition = this.position.add(unitVector);
-        this.position = calculateNewPosition(unitVector, this.position, wantedPosition, map);
+        this.position=calculateNewPosition(unitVector,this.position,wantedPosition,map);
         this.decreaseEnergyEndOfDay();
         this.age++;
 
@@ -101,31 +88,29 @@ public class Animal implements WorldElement, Comparable<Animal> {
         this.genome.moveCurrentGeneIndex();
     }
 
-    private Vector2d calculateNewPosition(Vector2d unitVector, Vector2d oldPosition, Vector2d wantedPosition, GlobeWorldMap map) {
-        int height = map.getMapHeight();
-        int width = map.getMapWidth();
-        int wantedX = wantedPosition.getX();
-        int wantedY = wantedPosition.getY();
+    private Vector2d calculateNewPosition(Vector2d unitVector,Vector2d oldPosition,Vector2d wantedPosition,GlobeWorldMap map) {
+        int height=map.getMapHeight();
+        int width=map.getMapWidth();
+        int wantedX=wantedPosition.getX();
+        int wantedY=wantedPosition.getY();
         Vector2d finalPosition = wantedPosition;
-        finalPosition = new Vector2d((wantedX + width) % width, wantedY); //to zawsze dziala , wiec nie trzeba rozpatrywac przypadkow
-        if (wantedY < 0 || wantedY >= height) {
-            this.orientation = this.getOrientation().reverse();
-            finalPosition = new Vector2d(finalPosition.getX(), oldPosition.getY());
+        finalPosition= new Vector2d((wantedX+width)%width,wantedY); //to zawsze dziala , wiec nie trzeba rozpatrywac przypadkow
+        if (wantedY<0 || wantedY>=height){
+            this.orientation=this.getOrientation().reverse();
+            finalPosition=new Vector2d(finalPosition.getX(),oldPosition.getY());
         }
         return finalPosition;
     }
-
     public void rotate() {
         this.orientation = this.orientation.rotate(this.genome.getActiveGene());
     }
 
     public void eat(AbstractPlant plant) {
         if (plant.getConsumptionEnergy() < 0) {
-            this.energy += (int) (plant.getConsumptionEnergy() * (1 - genome.getImmunityPercentage()));
+            this.energy += (int) (plant.getConsumptionEnergy() * (1-genome.getImmunityPercentage()));
         } else {
             this.energy += plant.getConsumptionEnergy();
         }
-        countEatenPlants++;
     }
 
     public void decreaseEnergyMating() {
@@ -150,17 +135,14 @@ public class Animal implements WorldElement, Comparable<Animal> {
 
     @Override
     public String toString() {
-
-        return "Zwierze, który ma %d energii, %d lat, %d dzieci,%d %% odporności, genotyp: %s, aktywny gen: %d, zjadł %d roślin, posiada %d potomków"
-                .formatted(this.energy,this.age,this.childCount,(int) (this.getGenome().getImmunityPercentage()*100),
-                this.getGenome().getGenes().toString(),this.getGenome().getActiveGene(),this.countEatenPlants,this.descendants.size());
+        return this.energy + " " + this.age + " " + this.childCount;
     }
 
     public int getEnergy() {
         return energy;
     }
 
-    public int getChildrenCount() {
+    public int getChildrenCount(){
         return childCount;
     }
 
@@ -182,7 +164,7 @@ public class Animal implements WorldElement, Comparable<Animal> {
 
     @Override
     public int compareTo(@NonNull Animal o) {
-        return Comparator.comparing(Animal::getEnergy).thenComparing(Animal::getAge).thenComparing(Animal::getChildrenCount).compare(this, o);
+        return Comparator.comparing(Animal::getEnergy).thenComparing(Animal::getAge).thenComparing(Animal::getChildrenCount).compare(this,o);
     }
 
     @Override
@@ -201,29 +183,4 @@ public class Animal implements WorldElement, Comparable<Animal> {
     public int getEnergyNeededToMate() {
         return animalConfig.energyUsedToMate();
     }
-
-    public int getCountEatenPlants() {
-        return countEatenPlants;
-    }
-    public int getDescendantsCount(){
-        return descendants.size();
-    }
-    public int getBirthDay(){
-        return birthDay;
-    }
-    public int getDayOfDeath(){
-        return dayOfDeath;
-    }
-    public int getActiveGeneIndex(){
-        return this.genome.getActiveGene();
-    }
-    public int getAge() {
-        return this.age;
-    }
-
-    public int getAgeForDead() {
-        return dayOfDeath-birthDay;
-    }
-
-
 }

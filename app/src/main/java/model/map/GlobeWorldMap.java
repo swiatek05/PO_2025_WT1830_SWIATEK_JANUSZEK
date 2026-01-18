@@ -25,17 +25,11 @@ public class GlobeWorldMap implements WorldMap {
     private final int MapWidth;
     private final int MapHeight;
     private final SimulationVariant simulationVariant;
-    private final int sizeJungle;
-    private final int sizeSteppe;
 
     private final Map<Vector2d, List<Animal>> animals = new HashMap<>();
     private final Map<Vector2d, AbstractPlant> plants = new HashMap<>();
     private final Set<Vector2d> FreePlaceForPlantsJungle = new HashSet<>();
     private final Set<Vector2d> FreePlaceForPlantsSteppe = new HashSet<>();
-    private final Map<Vector2d,Integer> countOfDeathOnPosition=new HashMap<>();
-    private int countOfDeathJungle=0;
-    private int countOfDeathSteppe=0;
-
 
     private final int jungleMinY; //zakladadam ze włącznie
     private final int jungleMaxY;
@@ -68,9 +62,6 @@ public class GlobeWorldMap implements WorldMap {
 
             }
         }
-
-        sizeJungle=(jungleHeight*MapWidth);
-        sizeSteppe=(MapWidth*MapHeight)-sizeJungle;
     }
 
     @Override
@@ -206,27 +197,6 @@ public class GlobeWorldMap implements WorldMap {
 //            return strongestAnimals.get(randomIdx);
 //        }
 //    }
-    private void addDeathToPosition(Vector2d position){
-        if(countOfDeathOnPosition.containsKey(position)){
-            int countOfDeath= countOfDeathOnPosition.get(position);
-            countOfDeath++;
-            countOfDeathOnPosition.remove(position);
-            countOfDeathOnPosition.put(position,countOfDeath);
-        }
-        else{
-            countOfDeathOnPosition.put(position,1);
-        }
-    }
-    private void addDeathToCounter(Vector2d position){
-        int y=position.getY();
-        if(y<jungleMinY || y>jungleMaxY){
-            countOfDeathSteppe+=1;
-        }
-        else{
-            countOfDeathJungle+=1;
-        }
-    }
-
 
     @Override
     public void removeDeadAnimals(int currentDay) {
@@ -240,8 +210,6 @@ public class GlobeWorldMap implements WorldMap {
                 Animal animal = listIterator.next();
                 if (animal.getEnergy() <= 0) {
                     animal.killOff(currentDay);
-                    addDeathToPosition(animal.getPosition());
-                    addDeathToCounter(animal.getPosition());
                     listIterator.remove();
                 }
             }
@@ -250,23 +218,14 @@ public class GlobeWorldMap implements WorldMap {
             }
         }
     }
-    private double getAverageMortalityJungle(){
-        double avg= (double)countOfDeathJungle/sizeJungle;
-        return avg;
-    }
-    private double getAverageMortalitySteppe(){
-        double avg= (double)countOfDeathSteppe/sizeSteppe;
-        return avg;
-    }
+
     @Override
     public void spawnPlants(int countPlants) {
         for (int i = 0; i < countPlants; i++) {
             double jungleOrSteppe = Math.random();
-            boolean isJungle=false;
             Vector2d position = null;
             if (jungleOrSteppe <= 0.8) {
                 position = findFreePositionInJungle();
-                isJungle=true;
                 if (position == null) {
                     position = findFreePositionInSteppe();
                 }
@@ -274,7 +233,6 @@ public class GlobeWorldMap implements WorldMap {
                 position = findFreePositionInSteppe();
                 if (position == null) {
                     position = findFreePositionInJungle();
-                    isJungle=true;
                 }
             }
             if (position != null) {
@@ -284,7 +242,7 @@ public class GlobeWorldMap implements WorldMap {
                 } else {
                     double edibleOrPoison = Math.random();
                     if (edibleOrPoison <= plantConfig.poisonPlantChance())
-                        plant = new PoisonGrass(position, plantConfig,countOfDeathOnPosition,mapConfig,getAverageMortalitySteppe(),getAverageMortalityJungle(),isJungle);
+                        plant = new PoisonGrass(position, plantConfig);
                     else
                         plant = new Grass(position, plantConfig);
 
@@ -430,23 +388,6 @@ public class GlobeWorldMap implements WorldMap {
             }
         }
         return children;
-    }
-    public List<Integer> findMinMaxEnergy(){
-        int minEnergy=Integer.MAX_VALUE;
-        int maxEnergy=Integer.MIN_VALUE;
-        for(List<Animal> animalList : animals.values()){
-            for(Animal animal: animalList){
-                if(minEnergy>animal.getEnergy()){
-                    minEnergy = animal.getEnergy();
-                }
-                if(maxEnergy<animal.getEnergy()){
-                    maxEnergy = animal.getEnergy();
-                }
-            }
-        }
-        return List.of(minEnergy,maxEnergy);
-
-
     }
 
     public int getPlantsCount() {
