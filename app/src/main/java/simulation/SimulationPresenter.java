@@ -321,10 +321,15 @@ public class SimulationPresenter {
 
         double currentEnergy=(double) animal.getEnergy();
 
-        double energyStan=(double) (currentEnergy-minEnergy)/ (double) (maxEnergy-minEnergy);
+        double denominator = (double) (maxEnergy-minEnergy);
+        double energyStan;
 
-        energyStan=Math.min(1.0,Math.max(0.2,energyStan));
-
+        if (denominator == 0) {
+            energyStan = 1.0;
+        } else {
+            energyStan=(currentEnergy-minEnergy)/denominator;
+        }
+        energyStan=Math.max(0.2,Math.min(1.0,energyStan));
         animalG.setFill(Color.WHITE.interpolate(Color.BLUE, energyStan));
         if (animal==trackedAnimal){
             animalG.setStroke(Color.GOLD);
