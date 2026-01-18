@@ -65,12 +65,26 @@ public class Animal implements WorldElement, Comparable<Animal> {
         this.age = age;
     }
     public void addDescendant(Animal descendant) {
-        if (descendants.add(descendant)) {
+        /*if (descendants.add(descendant)) {
             if (parent1!=null){
                 parent1.addDescendant(descendant);
             }
             if (parent2!=null){
                 parent2.addDescendant(descendant);
+            }
+        }*/
+        Queue<Animal> toProcess = new LinkedList<>();
+        toProcess.add(this);
+
+        while (!toProcess.isEmpty()) {
+            Animal current = toProcess.poll();
+            if (current.descendants.add(descendant)) {
+                if (current.parent1 != null) {
+                    toProcess.add(current.parent1);
+                }
+                if (current.parent2 != null) {
+                    toProcess.add(current.parent2);
+                }
             }
         }
     }
