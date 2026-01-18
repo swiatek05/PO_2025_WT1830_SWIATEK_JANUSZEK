@@ -203,8 +203,8 @@ public class ConfigurationPresenter {
             simulationId++;
             SimulationPresenter presenter=loader.getController();
             presenter.setSaveToCsv(csvCheckBox.isSelected());
-            presenter.setWorldConfig(config);
             presenter.setId(simulationId);
+            presenter.setWorldConfig(config);
 
             Stage simulationStage=new Stage();
             simulationStage.setTitle("Symulacja ID: "+ simulationId);

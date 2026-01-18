@@ -1,5 +1,6 @@
 package simulation;
 
+import com.opencsv.CSVWriter;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.geometry.HPos;
@@ -24,7 +25,10 @@ import simulation.configs.PlantConfig;
 import simulation.configs.SimulationConfig;
 
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class SimulationPresenter {
     @FXML
@@ -73,9 +77,9 @@ public class SimulationPresenter {
     private Simulation engine;
     private boolean isPaused = false;
     private double cellSize;
-    private boolean saveToCsv;
+    private boolean saveToCsv = false;
     private int id = 0;
-    private File csvOutputFile;
+    private CSVWriter csvWriter;
 
     private int currentDayDisplay=0;
 
@@ -85,6 +89,24 @@ public class SimulationPresenter {
         this.map = new GlobeWorldMap(config.mapConfig(),config.plantConfig());
         this.engine = new Simulation(map, config, this);
         initializeGridConstraints();
+
+        if (saveToCsv) {
+            try{
+                int randomId = ThreadLocalRandom.current().nextInt(0,99999);
+                FileWriter w = new FileWriter("simulationdata_id"+id+"_"+randomId+".csv",true);
+                csvWriter = new CSVWriter(w,
+                                CSVWriter.DEFAULT_SEPARATOR,
+                                CSVWriter.DEFAULT_QUOTE_CHARACTER,
+                                CSVWriter.DEFAULT_ESCAPE_CHARACTER,
+                                CSVWriter.DEFAULT_LINE_END);
+                String[] headers = {"Dzień", "Liczba zwierzaków", "Liczba roślin", "Liczba wolnych pól", "Średnia energia", "Średnia długość życia", "Średnia liczba dzieci"};
+
+                csvWriter.writeNext(headers);
+                csvWriter.flush();
+            } catch (IOException e) {
+                throw new RuntimeException("Nie udało się otworzyć pliku csv");
+            }
+        }
 
         Thread simulationThread = new Thread(engine);
         simulationThread.setDaemon(true);
@@ -136,7 +158,16 @@ public class SimulationPresenter {
     }
 
     private void writeToCsv(int currentDay) {
+            SimulationStatistics stats = engine.getStatistics();
+            String[] data = {String.valueOf(currentDay),String.valueOf(stats.getNumberOfAnimals()),String.valueOf(stats.getNumberOfPlants()),String.valueOf(stats.getFreeFields()),
+                             String.format("%.2f",stats.getAverageEnergy()),String.format("%.2f",stats.getAverageAgeForDead()),String.format("%.2f",stats.getAverageChildrenCount())};
+            csvWriter.writeNext(data);
 
+        try {
+            csvWriter.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private void updateStatistics(int currentDay){
@@ -279,7 +310,7 @@ public class SimulationPresenter {
         }
     }
     @FXML
-    public void onPauseButton(){
+    public void onPauseButton() {
         if (isPaused){
             engine.resume();
             pauseButton.setText("PAUZA");
