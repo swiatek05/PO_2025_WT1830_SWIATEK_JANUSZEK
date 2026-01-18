@@ -222,7 +222,7 @@ public class SimulationPresenter {
 
         double currentEnergy=(double) animal.getEnergy();
 
-        double energyStan=(double) (currentEnergy-minEnergy)/ (double) maxEnergy;
+        double energyStan=(double) (currentEnergy-minEnergy)/ (double) (maxEnergy-minEnergy);
 
         energyStan=Math.min(1.0,Math.max(0.2,energyStan));
 
