@@ -289,7 +289,7 @@ public class ConfigurationPresenter {
         SimulationConfig config = readFromUI();
 
         FileChooser fc = new FileChooser();
-        fc.getExtensionFilters().add(new FileChooser.ExtensionFilter("JSON Files",".json"));
+        fc.getExtensionFilters().add(new FileChooser.ExtensionFilter("JSON Files","*.json"));
 
         File file = fc.showSaveDialog(null);
         if (file == null) return;
@@ -304,7 +304,7 @@ public class ConfigurationPresenter {
     }
     public void onLoadConfig() {
         FileChooser fc = new FileChooser();
-        fc.getExtensionFilters().add(new FileChooser.ExtensionFilter("JSON Files",".json"));
+        fc.getExtensionFilters().add(new FileChooser.ExtensionFilter("JSON Files","*.json"));
 
         File file = fc.showOpenDialog(null);
         if (file == null) return;
