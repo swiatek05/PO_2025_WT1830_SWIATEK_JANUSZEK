@@ -16,7 +16,8 @@ public class Simulation implements Runnable {
     private  SimulationConfig simulationConfig;
     private SimulationPresenter presenter;
     private List<Animal> aliveAnimals = new ArrayList<>();
-    private List<Animal> deadAnimals = new ArrayList<>();
+    private int totalDeadAnimals = 0;
+    private long sumAgeOfDead = 0;
     private boolean isRunning = true;
     private volatile boolean isPaused = false;
     private int currentDay = 0;
@@ -60,7 +61,7 @@ public class Simulation implements Runnable {
             growPlants();
             //map.mapChanged("Dzień: "+currentDay);
 
-            statistics.update(aliveAnimals,map.getPlantsCount(),map.getFreeFields(),deadAnimals);
+            statistics.update(aliveAnimals,map.getPlantsCount(),map.getFreeFields(),sumAgeOfDead,totalDeadAnimals);
 
             List<Integer> MinMaxEnergy=map.findMinMaxEnergy();
 
@@ -84,7 +85,8 @@ public class Simulation implements Runnable {
             Animal animal=it.next();
             if (animal.getEnergy()<=0){
                 animal.killOff(currentDay);
-                deadAnimals.add(animal);
+                totalDeadAnimals++;
+                sumAgeOfDead += animal.getAgeForDead();
                 it.remove();
             }
         }

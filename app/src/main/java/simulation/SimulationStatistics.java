@@ -13,11 +13,11 @@ public class SimulationStatistics {
     private double averageAgeForDead;
     private double averageChildrenCount;
 
-    public void update(List<Animal> aliveAnimals,int plantsCount,int  freeFieldsCount,List<Animal> deadAnimals) {
+    public void update(List<Animal> aliveAnimals,int plantsCount,int  freeFieldsCount, long sumAgeOfDead, int totalDeadAnimals) {
         this.numberOfAnimals = aliveAnimals.size();
         this.numberOfPlants = plantsCount;
         this.freeFields = freeFieldsCount;
-        this.averageAgeForDead=findAverageAgeForDead(deadAnimals);
+        this.averageAgeForDead= totalDeadAnimals == 0 ? 0 : (double) sumAgeOfDead / totalDeadAnimals;
 
         if (aliveAnimals.isEmpty()) {
             this.averageEnergy = 0;
@@ -62,16 +62,16 @@ public class SimulationStatistics {
         }
         return mostPopularGenom;
     }
-    private double findAverageAgeForDead(List<Animal> deadAnimals) {  //it may be in inefficient so maybe change it later
-        long sumAge=0;
-        if(deadAnimals.isEmpty()){
-            return 0;
-        }
-        for(Animal animal : deadAnimals){
-            sumAge+=animal.getAgeForDead();
-        }
-        return (double) sumAge/deadAnimals.size();
-    }
+//    private double findAverageAgeForDead(List<Animal> deadAnimals) {  //it may be in inefficient so maybe change it later
+//        long sumAge=0;
+//        if(deadAnimals.isEmpty()){
+//            return 0;
+//        }
+//        for(Animal animal : deadAnimals){
+//            sumAge+=animal.getAgeForDead();
+//        }
+//        return (double) sumAge/deadAnimals.size();
+//    }
 
     public int getNumberOfAnimals() {
         return numberOfAnimals;
