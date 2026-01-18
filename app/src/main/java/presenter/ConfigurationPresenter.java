@@ -45,6 +45,7 @@ public class ConfigurationPresenter {
     @FXML private Label genomeLabel;
     @FXML private Spinner<Integer> genomeNumber;
     @FXML private Label genomeNumberLabel;
+    @FXML private CheckBox csvCheckBox;
 
     private int simulationId=0;
 
@@ -199,10 +200,13 @@ public class ConfigurationPresenter {
             FXMLLoader loader=new FXMLLoader(getClass().getResource("/simulation.fxml"));
             javafx.scene.Parent root = loader.load();
 
-            SimulationPresenter presenter=loader.getController();
-            presenter.setWorldConfig(config);
-            Stage simulationStage=new Stage();
             simulationId++;
+            SimulationPresenter presenter=loader.getController();
+            presenter.setSaveToCsv(csvCheckBox.isSelected());
+            presenter.setWorldConfig(config);
+            presenter.setId(simulationId);
+
+            Stage simulationStage=new Stage();
             simulationStage.setTitle("Symulacja ID: "+ simulationId);
             simulationStage.setScene(new Scene(root));
             simulationStage.show();

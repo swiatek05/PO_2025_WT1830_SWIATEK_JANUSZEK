@@ -4,7 +4,6 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.geometry.Insets?>
 
-<?import javafx.scene.chart.BubbleChart?>
 <ScrollPane fitToWidth="true" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
             fx:controller="presenter.ConfigurationPresenter">
     <VBox spacing="10">
@@ -18,6 +17,7 @@
             <ComboBox fx:id="presetComboBox" GridPane.columnIndex="1" GridPane.rowIndex="0"/>
             <Button text="Zapisz konfigurację" onAction="#onSaveConfig" GridPane.rowIndex="0" GridPane.columnIndex="4"/>
             <Button text="Wczytaj konfigurację" onAction="#onLoadConfig" GridPane.rowIndex="0" GridPane.columnIndex="5"/>
+            <CheckBox fx:id="csvCheckBox" text="Zapis do csv" GridPane.columnIndex="6" GridPane.rowIndex="0" />
         </GridPane>
 
         <TitledPane text="Ustawienia Mapy" collapsible="false">

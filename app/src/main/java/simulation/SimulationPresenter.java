@@ -23,6 +23,7 @@ import model.plant.PoisonGrass;
 import simulation.configs.PlantConfig;
 import simulation.configs.SimulationConfig;
 
+import java.io.File;
 import java.util.List;
 
 public class SimulationPresenter {
@@ -72,8 +73,12 @@ public class SimulationPresenter {
     private Simulation engine;
     private boolean isPaused = false;
     private double cellSize;
+    private boolean saveToCsv;
+    private int id = 0;
+    private File csvOutputFile;
 
     private int currentDayDisplay=0;
+
     public void setWorldConfig(SimulationConfig config) {
         this.config = config;
 
@@ -85,6 +90,15 @@ public class SimulationPresenter {
         simulationThread.setDaemon(true);
         simulationThread.start();
     }
+
+    public void setSaveToCsv(boolean saveToCsv) {
+        this.saveToCsv = saveToCsv;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
     private void initializeGridConstraints() {
         mapGrid.getChildren().clear();
         mapGrid.getColumnConstraints().clear();
@@ -104,6 +118,7 @@ public class SimulationPresenter {
             mapGrid.getRowConstraints().add(new RowConstraints(cellSize));
         }
     }
+
     public void mapChanged(int currentDay,int minEnergy,int maxEnergy){
         this.currentDayDisplay=currentDay;
         if (isPaused){
@@ -113,9 +128,17 @@ public class SimulationPresenter {
         Platform.runLater(() -> {
             drawMap(currentDay,minEnergy,maxEnergy);
             updateStatistics(currentDay);
+            if (saveToCsv) {
+                writeToCsv(currentDay);
+            }
             updateTrackedAnimal();
         });
     }
+
+    private void writeToCsv(int currentDay) {
+
+    }
+
     private void updateStatistics(int currentDay){
         SimulationStatistics stats=engine.getStatistics();
         day.setText(String.valueOf(currentDay));
