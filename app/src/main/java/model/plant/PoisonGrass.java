@@ -1,13 +1,7 @@
 package model.plant;
 
 import model.Vector2d;
-import model.util.Boundary;
-import model.util.MapException;
-import simulation.configs.MapConfig;
 import simulation.configs.PlantConfig;
-import model.map.GlobeWorldMap;
-
-import java.util.Map;
 
 public class PoisonGrass extends AbstractPlant {
     private double getLevelPoison(Vector2d position,Map<Vector2d,Integer> countOfDeathOnPosition,MapConfig mapConfig,double averageMortalitySteppe,double averageMortalityJungle,boolean isJungle) {

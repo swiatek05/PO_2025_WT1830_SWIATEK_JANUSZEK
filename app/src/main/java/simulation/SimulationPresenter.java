@@ -13,7 +13,6 @@ import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
-
 import model.Vector2d;
 import model.animal.Animal;
 import model.map.GlobeWorldMap;
@@ -47,33 +46,12 @@ public class SimulationPresenter {
     @FXML
     private Button pauseButton;
 
-    @FXML
-    private Label trackedGenome;
-    @FXML
-    private Label trackedActiveGene;
-    @FXML
-    private Label trackedEnergy;
-    @FXML
-    private Label trackedPlantsEaten;
-    @FXML
-    private Label trackedChildrenCount;
-    @FXML
-    private Label trackedDescendantsCount;
-    @FXML
-    private Label trackedAge;
-    @FXML
-    private Label trackedStatus;
-
-    private Animal trackedAnimal=null;
-
     private SimulationConfig config;
 
     private GlobeWorldMap map;
     private Simulation engine;
     private boolean isPaused = false;
     private double cellSize;
-
-    private int currentDayDisplay=0;
     public void setWorldConfig(SimulationConfig config) {
         this.config = config;
 
@@ -104,16 +82,13 @@ public class SimulationPresenter {
             mapGrid.getRowConstraints().add(new RowConstraints(cellSize));
         }
     }
-    public void mapChanged(int currentDay,int minEnergy,int maxEnergy){
-        this.currentDayDisplay=currentDay;
+    public void mapChanged(int currentDay){
         if (isPaused){
-            updateTrackedAnimal();
             return;
         }
         Platform.runLater(() -> {
-            drawMap(currentDay,minEnergy,maxEnergy);
+            drawMap(currentDay);
             updateStatistics(currentDay);
-            updateTrackedAnimal();
         });
     }
     private void updateStatistics(int currentDay){
@@ -136,7 +111,7 @@ public class SimulationPresenter {
         }
 
     }
-    private void drawMap(int currentDay,int minEnergy,int maxEnergy){
+    private void drawMap(int currentDay){
         mapGrid.getChildren().clear();
         int width=config.mapConfig().MapWidth();
         int height=config.mapConfig().MapHeight();
@@ -154,68 +129,18 @@ public class SimulationPresenter {
                 else{
                         rect.setFill(Color.BEIGE);
                     }
-                rect.setOnMouseClicked(event-> {
-                            if (isPaused) {
-                                selectAnimal(position,minEnergy,maxEnergy);
-                            }
-                        });
-
                 mapGrid.add(rect,x,y);
 
                 if (object instanceof Animal){
                     Animal animal=(Animal) object;
-                    drawAnimal(animal,x,y,minEnergy,maxEnergy);
+                    drawAnimal(animal,x,y);
                 }
 
             }
         }
     }
 
-    private void selectAnimal(Vector2d position,int minEnergy,int maxEnergy) {
-        List<Animal> animalsOnPosition=map.animalsAt(position);
-        if(animalsOnPosition.isEmpty()){return;}
-
-        Animal selectedAnimal;
-        if (animalsOnPosition.size()==1){
-            selectedAnimal=animalsOnPosition.get(0);
-        }
-        else{
-            javafx.scene.control.ChoiceDialog<Animal> dialog = new javafx.scene.control.ChoiceDialog<>(animalsOnPosition.get(0),animalsOnPosition);
-            dialog.setTitle("Wybierz zwierzaka");
-            dialog.setHeaderText("Na wybranym polu znajduje się zwierząt: "+animalsOnPosition.size());
-            dialog.setContentText("Wybierz zwierze do śledzenie: ");
-            selectedAnimal=dialog.showAndWait().orElse(null);
-        }
-        if (selectedAnimal!=null){
-            this.trackedAnimal=selectedAnimal;
-            updateTrackedAnimal();
-            drawMap(this.currentDayDisplay,minEnergy,maxEnergy);
-        }
-    }
-    private void updateTrackedAnimal(){
-        if(trackedAnimal==null) return;
-
-        Platform.runLater(()->{
-            trackedGenome.setText(trackedAnimal.getGenome().getGenes().toString());
-            trackedActiveGene.setText(String.valueOf(trackedAnimal.getGenome().getActiveGene()));
-            trackedEnergy.setText(String.valueOf(trackedAnimal.getEnergy()));
-            trackedPlantsEaten.setText(String.valueOf(trackedAnimal.getCountEatenPlants()));
-            trackedChildrenCount.setText(String.valueOf(trackedAnimal.getChildrenCount()));
-            trackedDescendantsCount.setText(String.valueOf(trackedAnimal.getDescendantsCount()));
-            if(trackedAnimal.isDead()){
-                trackedStatus.setText("Zmarł w dniu: "+trackedAnimal.getDayOfDeath());
-                trackedAge.setText("Żył przez: "+trackedAnimal.getAgeForDead());
-                trackedStatus.setTextFill(Color.RED);
-            }
-            else{
-                trackedStatus.setText("Żyje");
-                trackedAge.setText(String.valueOf(trackedAnimal.getAge()));
-                trackedStatus.setTextFill(Color.GREEN);
-            }
-        });
-    }
-
-    private void drawAnimal(Animal animal, int x, int y,int minEnergy,int maxEnergy) {
+    private void drawAnimal(Animal animal, int x, int y) {
         Circle animalG=new Circle(cellSize*0.4);
 
         double startEnergy=config.animalConfig().startEnergy();
@@ -226,20 +151,15 @@ public class SimulationPresenter {
 
         energyStan=Math.min(1.0,Math.max(0.2,energyStan));
 
-        animalG.setFill(Color.WHITE.interpolate(Color.BLUE, energyStan));
-        if (animal==trackedAnimal){
-            animalG.setStroke(Color.GOLD);
-            animalG.setStrokeWidth(3);
-            animalG.toFront();
-        }
-        else if (currentEnergy>startEnergy*3){ //dla poteznego zwierzaka
+        animalG.setFill(Color.hsb(240,energyStan,1.0));
+
+        if (currentEnergy>startEnergy*3){ //dla poteznego zwierzaka
             animalG.setStroke(Color.BLACK);
             animalG.setStrokeWidth(2);
         }
 
         GridPane.setHalignment(animalG, HPos.CENTER);
         GridPane.setValignment(animalG, VPos.CENTER);
-        animalG.setMouseTransparent(true);
         mapGrid.add(animalG,x,y);
     }
 
