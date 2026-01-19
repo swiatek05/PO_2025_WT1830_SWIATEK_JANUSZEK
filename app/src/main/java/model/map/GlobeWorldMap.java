@@ -85,12 +85,12 @@ public class GlobeWorldMap implements WorldMap {
 
 
     @Override
-    public void place(Animal animal) {
+    public synchronized void place(Animal animal) {
         addAnimalToMap(animal.getPosition(), animal);
     }
 
     @Override
-    public void move(Animal animal) {
+    public synchronized  void move(Animal animal) {
         Vector2d oldPosition = animal.getPosition();
         removeAnimalfromMap(oldPosition, animal);
         animal.rotate();
@@ -112,7 +112,7 @@ public class GlobeWorldMap implements WorldMap {
     }
 
     @Override
-    public List<Animal> animalsAt(Vector2d position) {
+    public synchronized List<Animal> animalsAt(Vector2d position) {
         List<Animal> animalsOnPosition = animals.get(position);
         if (animalsOnPosition == null) {
             return List.of();
@@ -122,12 +122,12 @@ public class GlobeWorldMap implements WorldMap {
     }
 
     @Override
-    public AbstractPlant plantAt(Vector2d position) {
+    public synchronized  AbstractPlant plantAt(Vector2d position) {
         return this.plants.get(position);  //mozliwy null czyli brak rosliny
     }
 
     @Override
-    public boolean isOccupied(Vector2d position) {
+    public synchronized  boolean isOccupied(Vector2d position) {
         if (plantAt(position) != null) {
             return true;
         }
@@ -137,7 +137,7 @@ public class GlobeWorldMap implements WorldMap {
 
     // i don't really see a use for this method (or idk I will use it for tests)
     @Override
-    public WorldElement objectAt(Vector2d position, int currentDay) {
+    public synchronized  WorldElement objectAt(Vector2d position, int currentDay) {
         synchronized (animals) {
             List<Animal> animals = animalsAt(position);
             if (animals != null && !animals.isEmpty()) {
@@ -229,7 +229,7 @@ public class GlobeWorldMap implements WorldMap {
 
 
     @Override
-    public void removeDeadAnimals(int currentDay) {
+    public synchronized void removeDeadAnimals(int currentDay) {
         Iterator<Map.Entry<Vector2d, List<Animal>>> it = animals.entrySet().iterator();
         while (it.hasNext()) {
             Map.Entry<Vector2d, List<Animal>> entry = it.next();
@@ -259,7 +259,7 @@ public class GlobeWorldMap implements WorldMap {
         return avg;
     }
     @Override
-    public void spawnPlants(int countPlants) {
+    public synchronized void spawnPlants(int countPlants) {
         for (int i = 0; i < countPlants; i++) {
             double jungleOrSteppe = Math.random();
             boolean isJungle=false;
@@ -388,7 +388,7 @@ public class GlobeWorldMap implements WorldMap {
     }
 
     @Override
-    public void eatPlants() {
+    public synchronized void eatPlants() {
         Set<Vector2d> plantPositions = new HashSet<>(plants.keySet());
         for (Vector2d position : plantPositions) {
             List<Animal> animalsOnPosition = animals.get(position);
@@ -403,7 +403,7 @@ public class GlobeWorldMap implements WorldMap {
     }
 
     @Override
-    public List<Animal> reproduce(int currentDay) {
+    public synchronized List<Animal> reproduce(int currentDay) {
         Set<Vector2d> animalPositions = new HashSet<>(animals.keySet());
         List<Animal> children = new ArrayList<>();
         for (Vector2d position : animalPositions) {
@@ -431,7 +431,7 @@ public class GlobeWorldMap implements WorldMap {
         }
         return children;
     }
-    public List<Integer> findMinMaxEnergy(){
+    public synchronized List<Integer> findMinMaxEnergy(){
         if (animals.isEmpty()){
             return List.of(0,0);
         }
