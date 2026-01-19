@@ -7,12 +7,15 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.HPos;
 import javafx.geometry.VPos;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.RowConstraints;
@@ -38,7 +41,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class SimulationPresenter {
     @FXML
-    private GridPane mapGrid;
+    private Canvas mapCanvas;
     @FXML
     private Label day;
     @FXML
@@ -79,11 +82,11 @@ public class SimulationPresenter {
     @FXML
     private LineChart<Number, Number> statsChart;
     @FXML
+    private GraphicsContext gc;
     public NumberAxis xAxis;
-
     private Animal trackedAnimal=null;
-
     private SimulationConfig config;
+
 
     private GlobeWorldMap map;
     private Simulation engine;
@@ -94,17 +97,29 @@ public class SimulationPresenter {
     private CSVWriter csvWriter;
 
     private int currentDayDisplay=0;
+    private int currentMinEnergy;
+    private int currentMaxEnergy;
 
     private final String[] statOptions = {"Liczba zwierzaków", "Liczba roślin", "Wolne pola", "Średnia energia", "Średnia długość życia", "Średnia liczba dzieci"};
     private XYChart.Series<Number, Number> chartDataSeries = new XYChart.Series<>();
 
     public void setWorldConfig(SimulationConfig config) {
         this.config = config;
-
         this.map = new GlobeWorldMap(config.mapConfig(),config.plantConfig());
-        this.engine = new Simulation(map, config, this);
-        initializeGridConstraints();
 
+        this.engine=new Simulation(map,config,this);
+
+        double initialCanvasWidth = mapCanvas.getWidth();
+        double initialCanvasHeight = mapCanvas.getHeight();
+
+        double sizeX=initialCanvasWidth/config.mapConfig().MapWidth();
+        double sizeY=initialCanvasHeight/config.mapConfig().MapHeight();
+        this.cellSize=Math.min(sizeX,sizeY);
+
+        mapCanvas.setWidth(this.cellSize*config.mapConfig().MapWidth());
+        mapCanvas.setHeight(this.cellSize*config.mapConfig().MapHeight());
+
+        this.gc=mapCanvas.getGraphicsContext2D();
         if (saveToCsv) {
             try{
                 int randomId = ThreadLocalRandom.current().nextInt(0,99999);
@@ -140,28 +155,10 @@ public class SimulationPresenter {
         this.id = id;
     }
 
-    private void initializeGridConstraints() {
-        mapGrid.getChildren().clear();
-        mapGrid.getColumnConstraints().clear();
-        mapGrid.getRowConstraints().clear();
-
-        int width=config.mapConfig().MapWidth();
-        int height=config.mapConfig().MapHeight();
-
-        double sizeX=600.0/width;
-        double sizeY=600.0/height;
-        cellSize=Math.min(sizeX,sizeY);
-
-        for (int i=0;i<width;i++){
-            mapGrid.getColumnConstraints().add(new ColumnConstraints(cellSize));
-        }
-        for (int i=0;i<height;i++){
-            mapGrid.getRowConstraints().add(new RowConstraints(cellSize));
-        }
-    }
-
     public void mapChanged(int currentDay,int minEnergy,int maxEnergy){
         this.currentDayDisplay=currentDay;
+        this.currentMinEnergy=minEnergy;
+        this.currentMaxEnergy=maxEnergy;
         if (isPaused){
             updateTrackedAnimal();
             return;
@@ -236,41 +233,30 @@ public class SimulationPresenter {
 
     }
     private void drawMap(int currentDay,int minEnergy,int maxEnergy){
-        mapGrid.getChildren().clear();
+        gc.clearRect(0,0,mapCanvas.getWidth(),mapCanvas.getHeight());
+        gc.setFill(Color.BEIGE);
+        gc.fillRect(0,0,mapCanvas.getWidth(),mapCanvas.getHeight());
         int width=config.mapConfig().MapWidth();
         int height=config.mapConfig().MapHeight();
 
         for(int y=0;y<height;y++){
             for(int x=0;x<width;x++){
                 Vector2d position=new Vector2d(x,y);
-                Rectangle rect=new Rectangle(cellSize,cellSize);
-
                 Object object=map.objectAt(position,currentDay);
                 if (object instanceof AbstractPlant) {
                     AbstractPlant plant = (AbstractPlant) object;
-                    rect.setFill(calculatePlantColor(plant));
+                    gc.setFill(calculatePlantColor(plant));
+                    gc.fillRect(x*cellSize,y*cellSize,cellSize,cellSize);
                 }
-                else{
-                        rect.setFill(Color.BEIGE);
-                    }
-                rect.setOnMouseClicked(event-> {
-                            if (isPaused) {
-                                selectAnimal(position,minEnergy,maxEnergy);
-                            }
-                        });
-
-                mapGrid.add(rect,x,y);
-
                 if (object instanceof Animal){
                     Animal animal=(Animal) object;
                     drawAnimal(animal,x,y,minEnergy,maxEnergy);
                 }
-
             }
         }
     }
 
-    private void selectAnimal(Vector2d position,int minEnergy,int maxEnergy) {
+    private void selectAnimal(Vector2d position) {
         List<Animal> animalsOnPosition=map.animalsAt(position);
         if(animalsOnPosition.isEmpty()){return;}
 
@@ -288,7 +274,7 @@ public class SimulationPresenter {
         if (selectedAnimal!=null){
             this.trackedAnimal=selectedAnimal;
             updateTrackedAnimal();
-            drawMap(this.currentDayDisplay,minEnergy,maxEnergy);
+            drawMap(this.currentDayDisplay,this.currentMinEnergy,this.currentMaxEnergy);
         }
     }
     private void updateTrackedAnimal(){
@@ -315,10 +301,7 @@ public class SimulationPresenter {
     }
 
     private void drawAnimal(Animal animal, int x, int y,int minEnergy,int maxEnergy) {
-        Circle animalG=new Circle(cellSize*0.4);
-
         double startEnergy=config.animalConfig().startEnergy();
-
         double currentEnergy=(double) animal.getEnergy();
 
         double denominator = (double) (maxEnergy-minEnergy);
@@ -330,21 +313,23 @@ public class SimulationPresenter {
             energyStan=(currentEnergy-minEnergy)/denominator;
         }
         energyStan=Math.max(0.2,Math.min(1.0,energyStan));
-        animalG.setFill(Color.WHITE.interpolate(Color.BLUE, energyStan));
+        gc.setFill(Color.WHITE.interpolate(Color.BLUE, energyStan));
+
+        double margin=cellSize*0.20;
+        double size=cellSize-(2*margin);
+        double posX=x*cellSize+margin;
+        double posY=y*cellSize+margin;
+        gc.fillOval(posX,posY,size,size);
         if (animal==trackedAnimal){
-            animalG.setStroke(Color.GOLD);
-            animalG.setStrokeWidth(3);
-            animalG.toFront();
+            gc.setStroke(Color.GOLD);
+            gc.setLineWidth(cellSize*0.15);
+            gc.strokeOval(posX,posY,size,size);
         }
         else if (currentEnergy>startEnergy*3){ //dla poteznego zwierzaka
-            animalG.setStroke(Color.BLACK);
-            animalG.setStrokeWidth(2);
+           gc.setStroke(Color.BLACK);
+           gc.setLineWidth(cellSize*0.15);
+           gc.strokeOval(posX,posY,size,size);
         }
-
-        GridPane.setHalignment(animalG, HPos.CENTER);
-        GridPane.setValignment(animalG, VPos.CENTER);
-        animalG.setMouseTransparent(true);
-        mapGrid.add(animalG,x,y);
     }
 
     private Paint calculatePlantColor(AbstractPlant plant) {
@@ -378,5 +363,18 @@ public class SimulationPresenter {
 
         xAxis.setLowerBound(currentDayDisplay);
         xAxis.setAutoRanging(true);
+    }
+    @FXML
+    private void onMapClick(MouseEvent event){
+        if (!isPaused){return;}
+
+        int x=(int) (event.getX()/cellSize);
+        int y=(int) (event.getY()/cellSize);
+
+        if (x>=0 && x<config.mapConfig().MapWidth() && y>=0 && y<config.mapConfig().MapHeight()){
+            selectAnimal(new Vector2d(x,y));
+        }
+
+
     }
 }
