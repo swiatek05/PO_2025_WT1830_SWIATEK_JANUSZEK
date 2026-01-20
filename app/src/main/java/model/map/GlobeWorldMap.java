@@ -135,7 +135,6 @@ public class GlobeWorldMap implements WorldMap {
         return animals != null && !animals.isEmpty();
     }
 
-    // i don't really see a use for this method (or idk I will use it for tests)
     @Override
     public synchronized  WorldElement objectAt(Vector2d position, int currentDay) {
         synchronized (animals) {
@@ -152,60 +151,6 @@ public class GlobeWorldMap implements WorldMap {
 
     }
 
-    // simpler implementation of this method was made as compareTo in Animal
-//    public Animal findStrongestAnimal(List<Animal> animals,int currentDay) { //mozna sie zastanowic jak to zmienic bo troche brzydkie a petle sie powtarszaja prawie ze
-//        List<Animal> strongestAnimals=new ArrayList<>();
-//        int maxEnergy=-1;
-//        for (Animal animal:animals){ //szukam max
-//            if (animal.getEnergy()>maxEnergy){
-//                maxEnergy=animal.getEnergy();
-//            }
-//        }
-//        for (Animal animal:animals){ //szukam zwierzat z max
-//            if (animal.getEnergy()==maxEnergy){
-//                strongestAnimals.add(animal);
-//            }
-//        }
-//        if  (strongestAnimals.size()==1){return strongestAnimals.get(0);} //sprawa rozszczygnieta
-//
-//
-//        int maxAge=-1;
-//        for  (Animal animal:strongestAnimals){
-//            if (animal.getAge(currentDay)>maxAge){
-//                maxAge=animal.getAge(currentDay);
-//            }
-//        }
-//        List<Animal> tmp= new ArrayList<>();
-//        for (Animal animal:strongestAnimals){
-//            if (animal.getAge(currentDay)==maxAge){
-//                tmp.add(animal);
-//            }
-//        }
-//        strongestAnimals=tmp;
-//        if (strongestAnimals.size()==1){return strongestAnimals.get(0);}
-//
-//
-//        int maxChildCount=-1;
-//        for  (Animal animal:strongestAnimals){
-//            if (animal.getChildrenCount()>maxChildCount){
-//                maxChildCount=animal.getChildrenCount();
-//            }
-//        }
-//        tmp= new ArrayList<>();
-//        for (Animal animal:strongestAnimals){
-//            if (animal.getChildrenCount()==maxChildCount){
-//                tmp.add(animal);
-//            }
-//        }
-//        strongestAnimals=tmp;
-//        if (strongestAnimals.size()==1){
-//            return strongestAnimals.get(0);
-//        }
-//        else{
-//            int randomIdx=(int)(Math.random()*strongestAnimals.size());
-//            return strongestAnimals.get(randomIdx);
-//        }
-//    }
     private void addDeathToPosition(Vector2d position){
         if(countOfDeathOnPosition.containsKey(position)){
             int countOfDeath= countOfDeathOnPosition.get(position);
@@ -363,16 +308,11 @@ public class GlobeWorldMap implements WorldMap {
         }
     }
 
-    // why is this seperate from place, if place just calls this method?
     private void addAnimalToMap(Vector2d position, Animal animal) {
         if (!animals.containsKey(position)) {
             animals.put(position, new ArrayList<>());
         }
         animals.get(position).add(animal);
-    }
-
-    public Map<Vector2d, AbstractPlant> getPlants() {
-        return plants;
     }
 
 

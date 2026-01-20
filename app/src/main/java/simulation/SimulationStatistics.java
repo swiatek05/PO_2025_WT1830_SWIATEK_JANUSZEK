@@ -62,16 +62,6 @@ public class SimulationStatistics {
         }
         return mostPopularGenom;
     }
-//    private double findAverageAgeForDead(List<Animal> deadAnimals) {  //it may be in inefficient so maybe change it later
-//        long sumAge=0;
-//        if(deadAnimals.isEmpty()){
-//            return 0;
-//        }
-//        for(Animal animal : deadAnimals){
-//            sumAge+=animal.getAgeForDead();
-//        }
-//        return (double) sumAge/deadAnimals.size();
-//    }
 
     public int getNumberOfAnimals() {
         return numberOfAnimals;

@@ -1,6 +1,5 @@
 package model;
 
-import java.util.List;
 import java.util.Random;
 
 public enum MapDirection {
@@ -14,24 +13,6 @@ public enum MapDirection {
     NORTHWEST;
 
     private static final MapDirection[] MOVE_VALUES = MapDirection.values();
-
-//    public MapDirection next(){
-//        return switch (this){
-//            case NORTH -> EAST;
-//            case EAST -> SOUTH;
-//            case SOUTH -> WEST;
-//            case WEST -> NORTH;
-//        };
-//    }
-//
-//    public MapDirection previous(){
-//        return switch (this){
-//            case NORTH -> WEST;
-//            case WEST -> SOUTH;
-//            case SOUTH -> EAST;
-//            case EAST -> NORTH;
-//        };
-//    }
 
     public Vector2d toUnitVector(){
         return switch (this) {

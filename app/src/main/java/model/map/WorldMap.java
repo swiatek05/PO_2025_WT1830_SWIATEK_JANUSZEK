@@ -10,27 +10,27 @@ import model.util.Boundary;
 import java.util.List;
 
 public interface WorldMap  {
-    void place(Animal animal); //umieszcza zwierze na mapie
+    void place(Animal animal);
 
-    void move(Animal animal); //przesuwa zwierze zgodnie z jego logika (czyli geny i orientacja)
+    void move(Animal animal);
 
-    List<Animal> animalsAt(Vector2d position); //zwraca liste zwierzat na danej pozycji
+    List<Animal> animalsAt(Vector2d position);
 
-    AbstractPlant plantAt(Vector2d position); //zwraca roslin ejesli istnieje
+    AbstractPlant plantAt(Vector2d position);
 
-    boolean isOccupied(Vector2d position); //zprawdza czy na polu cos jest (roslina albo zwierze)
+    boolean isOccupied(Vector2d position);
 
-    WorldElement objectAt(Vector2d position,int currentDay); //zwraca jakis obiekt na danej pozycji
+    WorldElement objectAt(Vector2d position,int currentDay);
 
-    void removeDeadAnimals(int currentDay); //usuwa martwe zwierzeta z mapy
+    void removeDeadAnimals(int currentDay);
 
-    void spawnPlants(int countPlants); //wyrastanie roslin
+    void spawnPlants(int countPlants);
 
-    Boundary getCurrentBounds(); //zwraca granice mapy dla wyswietlania
+    Boundary getCurrentBounds();
 
-    int getId(); //id (pisalo zeby wiele okien zrobic)
+    int getId();
 
-    void addObserver(MapChangeListener observer); //rejestracja obserwatora , zeby GUI wiedziało ze trzeba odswiezyc
+    void addObserver(MapChangeListener observer);
 
     void eatPlants();
 

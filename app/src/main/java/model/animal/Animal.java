@@ -65,14 +65,6 @@ public class Animal implements WorldElement, Comparable<Animal> {
         this.age = age;
     }
     public void addDescendant(Animal descendant) {
-        /*if (descendants.add(descendant)) {
-            if (parent1!=null){
-                parent1.addDescendant(descendant);
-            }
-            if (parent2!=null){
-                parent2.addDescendant(descendant);
-            }
-        }*/
         Queue<Animal> toProcess = new LinkedList<>();
         toProcess.add(this);
 
@@ -190,10 +182,6 @@ public class Animal implements WorldElement, Comparable<Animal> {
         this.dayOfDeath = currentDay;
     }
 
-    public boolean isAt(Vector2d position) {
-        return this.position.equals(position);
-    }
-
     @Override
     public int compareTo(@NonNull Animal o) {
         return Comparator.comparing(Animal::getEnergy).thenComparing(Animal::getAge).thenComparing(Animal::getChildrenCount).compare(this, o);
@@ -211,25 +199,14 @@ public class Animal implements WorldElement, Comparable<Animal> {
         return Objects.hash(orientation, position, energy, genome, dayOfDeath, age, birthDay, childCount);
     }
 
-    // i'm not sure about this
-    public int getEnergyNeededToMate() {
-        return animalConfig.energyUsedToMate();
-    }
-
     public int getCountEatenPlants() {
         return countEatenPlants;
     }
     public int getDescendantsCount(){
         return descendants.size();
     }
-    public int getBirthDay(){
-        return birthDay;
-    }
     public int getDayOfDeath(){
         return dayOfDeath;
-    }
-    public int getActiveGeneIndex(){
-        return this.genome.getActiveGene();
     }
     public int getAge() {
         return this.age;

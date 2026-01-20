@@ -3,10 +3,7 @@ package simulation;
 import com.opencsv.CSVWriter;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.geometry.HPos;
-import javafx.geometry.VPos;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.chart.LineChart;
@@ -16,24 +13,15 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.ColumnConstraints;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.RowConstraints;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
-import javafx.scene.shape.Circle;
-import javafx.scene.shape.Rectangle;
 
 import model.Vector2d;
 import model.animal.Animal;
 import model.map.GlobeWorldMap;
-import model.map.WorldMap;
 import model.plant.AbstractPlant;
-import model.plant.PoisonGrass;
-import simulation.configs.PlantConfig;
 import simulation.configs.SimulationConfig;
 
-import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
@@ -192,10 +180,6 @@ public class SimulationPresenter {
         double value = getValue(stats);
 
         chartDataSeries.getData().add(new XYChart.Data<>(currentDay, value));
-
-//        if (chartDataSeries.getData().size() > 100) {
-//            chartDataSeries.getData().removeFirst();
-//        }
     }
 
     private double getValue(SimulationStatistics stats) {

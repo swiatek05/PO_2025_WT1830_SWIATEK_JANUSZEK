@@ -105,10 +105,6 @@ public class Genome {
         return genes;
     }
 
-    public int getCurrentGeneIndex() {
-        return currentGeneIndex;
-    }
-
     public void moveCurrentGeneIndex() {
         this.currentGeneIndex = (currentGeneIndex + 1) % genes.size();
     }
